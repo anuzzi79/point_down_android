@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.pointdown.app-debug-32:/layout_activity_main.xml.flat",
+        "source": "com.pointdown.app-main-34:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.pointdown.app-debug-32:/layout_activity_settings.xml.flat",
+        "source": "com.pointdown.app-main-34:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "com.pointdown.app-debug-32:/layout_item_issue.xml.flat",
+        "source": "com.pointdown.app-main-34:/layout/item_issue.xml"
+    },
+    {
+        "merged": "com.pointdown.app-debug-32:/menu_main_menu.xml.flat",
+        "source": "com.pointdown.app-main-34:/menu/main_menu.xml"
+    },
+    {
+        "merged": "com.pointdown.app-debug-32:/drawable_ic_notification.xml.flat",
+        "source": "com.pointdown.app-main-34:/drawable/ic_notification.xml"
+    }
+]

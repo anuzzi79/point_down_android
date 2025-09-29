@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">point_down</string>
+    <string name="status_loading">Carregando issues da sprint atual…</string>
+    <string name="special_title">Você pode estar precisando baixar também pontos destas cards</string>
+    <string name="open_in_browser">Abrir</string>
+    <string name="notif_title">Precisa baixar o ponto</string>
+    <string name="notif_text">Toque para abrir o point_down e ajustar os Story Points.</string>
+    <string name="notif_channel_name">point_down lembrete diário</string>
+    <string name="notif_channel_desc">Notificação diária para baixar/sobir Story Points</string>
+</resources>
