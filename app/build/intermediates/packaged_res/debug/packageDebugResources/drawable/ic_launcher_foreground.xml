@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Foreground dell'icona: usa il PNG pointing_down ma con più margine (= più piccolo) -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/pointing_down"
+    android:insetLeft="15dp"
+    android:insetTop="15dp"
+    android:insetRight="15dp"
+    android:insetBottom="15dp"/>

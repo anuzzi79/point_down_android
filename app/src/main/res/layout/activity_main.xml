@@ -11,63 +11,91 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <!-- Titolo -->
-        <TextView
-            android:id="@+id/toolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:layout_gravity="center_vertical" />
-
-        <!-- Testo Save (inizialmente nascosto) -->
-        <TextView
-            android:id="@+id/saveText"
+        <!-- (opzionale) pulsante Save in toolbar: può restare, ma il footer è quello “principale” -->
+        <Button
+            android:id="@+id/saveBtnToolbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:textColor="@android:color/holo_green_light"
-            android:paddingStart="16dp"
-            android:alpha="0"
             android:visibility="gone"
-            android:textSize="16sp"
-            android:layout_gravity="center_vertical" />
-
+            android:alpha="0"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text="Status"
-        android:textColor="@android:color/white"
-        android:background="#333333"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/specialTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Special Issues"
-        android:visibility="gone"
-        android:padding="8dp"
-        android:textStyle="bold"
-        android:textColor="@android:color/holo_orange_light" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerMain"
+    <!-- Contenuti scrollabili: status + liste -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#222222" />
+        android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerSpecial"
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Status"
+            android:textColor="@android:color/white"
+            android:background="#333333"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/specialTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Special Issues"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_orange_light" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerMain"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#222222" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerSpecial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:background="#1A1A1A" />
+    </LinearLayout>
+
+    <!-- Footer “freezato” con i 3 pulsanti -->
+    <LinearLayout
+        android:id="@+id/footerBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="#1A1A1A" />
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center"
+        android:background="#1F1F1F"
+        android:elevation="8dp">
+
+        <Button
+            android:id="@+id/footerSaveBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Save"/>
+
+        <Button
+            android:id="@+id/footerSaveExitBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Save &amp; Exit"/>
+
+        <Button
+            android:id="@+id/footerExitBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Exit"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AlphaAnimation
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +30,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var recyclerMain: RecyclerView
     private lateinit var recyclerSpecial: RecyclerView
     private lateinit var specialTitle: TextView
-    private lateinit var saveText: TextView   // 👈 scritta "Save"
+    private lateinit var saveBtnToolbar: Button
+
+    // Footer buttons
+    private lateinit var footerSaveBtn: Button
+    private lateinit var footerSaveExitBtn: Button
+    private lateinit var footerExitBtn: Button
 
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext = Dispatchers.Main + job
@@ -49,12 +55,18 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.title = getString(R.string.app_name)
 
         statusText = findViewById(R.id.statusText)
         recyclerMain = findViewById(R.id.recyclerMain)
         recyclerSpecial = findViewById(R.id.recyclerSpecial)
         specialTitle = findViewById(R.id.specialTitle)
-        saveText = findViewById(R.id.saveText)
+        saveBtnToolbar = findViewById(R.id.saveBtnToolbar)
+
+        // Footer
+        footerSaveBtn = findViewById(R.id.footerSaveBtn)
+        footerSaveExitBtn = findViewById(R.id.footerSaveExitBtn)
+        footerExitBtn = findViewById(R.id.footerExitBtn)
 
         recyclerMain.layoutManager = LinearLayoutManager(this)
         recyclerSpecial.layoutManager = LinearLayoutManager(this)
@@ -65,9 +77,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         recyclerMain.adapter = adapterMain
         recyclerSpecial.adapter = adapterSpecial
 
-        saveText.setOnClickListener { saveChanges() }
+        saveBtnToolbar.setOnClickListener { saveChanges(false) }
+        footerSaveBtn.setOnClickListener { saveChanges(false) }
+        footerSaveExitBtn.setOnClickListener { saveChanges(true) }
+        footerExitBtn.setOnClickListener { finish() }
 
-        // permesso notifiche (solo Android 13+)
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -94,7 +108,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_refresh -> { loadData(); true }
-            R.id.action_save -> { saveChanges(); true } // fallback
+            R.id.action_save -> { saveChanges(false); true }
             R.id.action_settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
@@ -124,7 +138,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
         launch {
             try {
-                val (main, special) = withContext(Dispatchers.IO) {
+                val mainList: MutableList<IssueItem>
+                val specialList: MutableList<IssueItem>
+
+                withContext(Dispatchers.IO) {
                     val finalMain = jira!!.fetchCurrentSprintIssues(jql)
                     Log.e("point_down", "✅ JQL finale usato: ${jql ?: "default"}")
                     Log.e("point_down", "📊 Main JQL -> trovate ${finalMain.size} cards")
@@ -132,11 +149,35 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     val spec = jira!!.fetchSpecialSprintIssues()
                     Log.e("point_down", "📊 Special JQL -> trovate ${spec.size} cards")
 
-                    Pair(finalMain, spec.filter { s -> finalMain.none { it.key == s.key } })
+                    mainList = finalMain.toMutableList()
+                    val dedupSpecial = spec.filter { s -> finalMain.none { it.key == s.key } }
+                    specialList = dedupSpecial.toMutableList()
                 }
 
-                itemsMain.clear(); itemsMain.addAll(main)
-                itemsSpecial.clear(); itemsSpecial.addAll(special)
+                // Card di test opzionale (Chrome-like)
+                val force = prefs.forceTestCard
+                val forcedKey = (prefs.testIssueKey ?: "FGC-9683").ifBlank { "FGC-9683" }
+                if (force) {
+                    try {
+                        val alreadyKeys: Set<String> = (mainList + specialList).map { it.key }.toSet()
+                        if (!alreadyKeys.contains(forcedKey)) {
+                            val forced = withContext(Dispatchers.IO) { jira!!.fetchIssueByKey(forcedKey) }
+                            if (forced != null) {
+                                Log.e("point_down", "🧪 Card di test aggiunta: $forcedKey")
+                                mainList.add(0, forced)
+                            } else {
+                                Log.e("point_down", "🧪 Nessuna card di test trovata per key=$forcedKey")
+                            }
+                        } else {
+                            Log.e("point_down", "🧪 Card di test già presente: $forcedKey")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("point_down", "🧪 Errore fetch card di test $forcedKey", e)
+                    }
+                }
+
+                itemsMain.clear(); itemsMain.addAll(mainList)
+                itemsSpecial.clear(); itemsSpecial.addAll(specialList)
 
                 adapterMain?.setData(ArrayList(itemsMain))
 
@@ -157,23 +198,52 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    private fun saveChanges() {
+    private fun saveChanges(exitAfter: Boolean) {
         val toSave = (itemsMain + itemsSpecial).filter { it.dirty && it.newSp != it.sp }
         if (toSave.isEmpty()) {
             setStatus("Nada para salvar.")
+            if (exitAfter) finish()
             return
         }
         setStatus("💾 Salvando alterações…")
         launch {
             try {
                 withContext(Dispatchers.IO) {
-                    toSave.forEach { jira!!.updateStoryPoints(it.key, it.newSp) }
+                    toSave.forEach { issue ->
+                        val pts = issue.pts ?: issue.sp
+                        val userNew = issue.newSp
+                        val lova = pts - userNew
+
+                        val pas = jira!!.getCurrentStoryPoints(issue.key)
+
+                        fun clampHalfNonNeg(v: Double): Double {
+                            val r = kotlin.math.round(v * 2.0) / 2.0
+                            return if (r < 0.0) 0.0 else r
+                        }
+
+                        val np = if (pas == pts) clampHalfNonNeg(userNew)
+                        else clampHalfNonNeg(pas - lova)
+
+                        jira!!.updateStoryPoints(issue.key, np)
+
+                        // Baseline aggiornata subito (Chrome-like)
+                        issue.sp = np
+                        issue.newSp = np
+                        issue.pts = np
+                        issue.dirty = false
+                    }
                 }
-                toSave.forEach { it.sp = it.newSp; it.dirty = false }
                 adapterMain?.notifyDataSetChanged()
                 adapterSpecial?.notifyDataSetChanged()
                 setStatus("✅ ${toSave.size} issue(s) atualizadas.")
-                saveText.visibility = View.GONE
+                saveBtnToolbar.visibility = View.GONE
+
+                if (exitAfter) {
+                    finish()
+                } else {
+                    // Aggiorna dal server come nel modal Chrome dopo “Save”
+                    loadData()
+                }
             } catch (e: Exception) {
                 Log.e("point_down", "❌ Errore no saveChanges", e)
                 setStatus("❌ Erro ao salvar: ${e.message}")
@@ -181,15 +251,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    // 🔥 Mostra il testo Save con fade-in
+    // Mostra il pulsante Save in toolbar con fade-in dopo edit (opzionale)
     private fun onDirtyChanged() {
-        if (saveText.visibility != View.VISIBLE) {
-            saveText.visibility = View.VISIBLE
+        if (saveBtnToolbar.visibility != View.VISIBLE) {
+            saveBtnToolbar.visibility = View.VISIBLE
             val fadeIn = AlphaAnimation(0f, 1f).apply {
                 duration = 500
                 fillAfter = true
             }
-            saveText.startAnimation(fadeIn)
+            saveBtnToolbar.startAnimation(fadeIn)
         }
     }
 }

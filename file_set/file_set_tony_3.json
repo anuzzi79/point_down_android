@@ -1,0 +1,26 @@
+{
+  "base_dir": "C:/Users/Antonio Nuzzi/PointDownAndroid",
+  "files": [
+    "app\\src\\main\\AndroidManifest.xml",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\MainActivity.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\SettingsActivity.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\alarm\\AlarmScheduler.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\alarm\\BootReceiver.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\alarm\\NotificationReceiver.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\data\\JiraClient.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\data\\Models.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\data\\Prefs.kt",
+    "app\\src\\main\\kotlin\\com\\pointdown\\app\\ui\\IssueAdapter.kt",
+    "app\\src\\main\\res\\drawable\\ic_launcher_background.xml",
+    "app\\src\\main\\res\\drawable\\ic_launcher_foreground.xml",
+    "app\\src\\main\\res\\drawable\\ic_notification.xml",
+    "app\\src\\main\\res\\layout\\activity_main.xml",
+    "app\\src\\main\\res\\layout\\activity_settings.xml",
+    "app\\src\\main\\res\\layout\\item_issue.xml",
+    "app\\src\\main\\res\\menu\\main_menu.xml",
+    "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher.xml",
+    "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_round.xml",
+    "app\\src\\main\\res\\values\\ic_launcher_background.xml",
+    "app\\src\\main\\res\\values\\strings.xml"
+  ]
+}

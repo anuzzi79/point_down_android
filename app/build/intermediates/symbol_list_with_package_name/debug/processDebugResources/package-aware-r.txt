@@ -1435,6 +1435,7 @@ color foreground_material_dark
 color foreground_material_light
 color highlighted_text_material_dark
 color highlighted_text_material_light
+color ic_launcher_background
 color m3_appbar_overlay_color
 color m3_assist_chip_icon_tint_color
 color m3_assist_chip_stroke_color
@@ -3020,6 +3021,9 @@ drawable ic_call_decline_low
 drawable ic_clear_black_24
 drawable ic_clock_black_24dp
 drawable ic_keyboard_black_24dp
+drawable ic_launcher_background
+drawable ic_launcher_bg_white
+drawable ic_launcher_foreground
 drawable ic_m3_chip_check
 drawable ic_m3_chip_checked_circle
 drawable ic_m3_chip_close
@@ -3029,6 +3033,7 @@ drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_notification
 drawable ic_search_black_24
+drawable ic_static_launcher
 drawable indeterminate_static
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
@@ -3102,6 +3107,7 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable pointing_down
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -3311,6 +3317,11 @@ id fitXY
 id fixed
 id flip
 id floating
+id footerBar
+id footerExitBtn
+id footerSaveBtn
+id footerSaveExitBtn
+id forceTestCardCheck
 id forever
 id fragment_container_view_tag
 id frost
@@ -3490,7 +3501,7 @@ id right_side
 id rounded
 id row_index_key
 id saveBtn
-id saveText
+id saveBtnToolbar
 id save_non_transition_alpha
 id save_overlay_view
 id sawtooth
@@ -3572,6 +3583,7 @@ id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
 id tag_window_insets_animation_callback
 id testBtn
+id testIssueKeyEdit
 id text
 id text2
 id textEnd
@@ -3596,7 +3608,6 @@ id title_template
 id toggle
 id tokenEdit
 id toolbar
-id toolbarTitle
 id top
 id topPanel
 id touch_outside
@@ -3833,6 +3844,9 @@ layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
 menu main_menu
+mipmap ic_launcher
+mipmap ic_launcher_foreground
+mipmap ic_launcher_round
 plurals mtrl_badge_content_description
 string abc_action_bar_home_description
 string abc_action_bar_up_description
@@ -4003,6 +4017,16 @@ string search_menu_title
 string searchbar_scrolling_view_behavior
 string searchview_clear_text_content_description
 string searchview_navigation_content_description
+string settings_auth_fail
+string settings_conn_ok
+string settings_fill_required
+string settings_force_test_card_title
+string settings_required_missing
+string settings_save_btn
+string settings_saved_ok
+string settings_test_conn
+string settings_test_issue_key_hint
+string settings_testing
 string side_sheet_accessibility_pane_title
 string side_sheet_behavior
 string special_title

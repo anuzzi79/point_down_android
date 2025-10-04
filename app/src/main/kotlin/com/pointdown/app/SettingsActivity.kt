@@ -25,6 +25,8 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         val email = findViewById<EditText>(R.id.emailEdit)
         val token = findViewById<EditText>(R.id.tokenEdit)
         val jql = findViewById<EditText>(R.id.jqlEdit)
+        val testCardCheck = findViewById<CheckBox>(R.id.forceTestCardCheck)
+        val testIssueKeyEdit = findViewById<EditText>(R.id.testIssueKeyEdit)
         val timePicker = findViewById<TimePicker>(R.id.timePicker)
         val status = findViewById<TextView>(R.id.statusTextSettings)
         val testBtn = findViewById<Button>(R.id.testBtn)
@@ -35,6 +37,9 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         token.setText(prefs.token)
         jql.setText(prefs.jql)
 
+        testCardCheck.isChecked = prefs.forceTestCard
+        testIssueKeyEdit.setText(prefs.testIssueKey ?: "FGC-9683")
+
         val (h0,m0) = prefs.getHourMinute()
         timePicker.setIs24HourView(true)
         if (Build.VERSION.SDK_INT >= 23) {
@@ -44,18 +49,18 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         }
 
         testBtn.setOnClickListener {
-            status.text = "Testando…"
+            status.text = getString(R.string.settings_testing)
             val bu = baseUrl.text.toString().trim()
             val em = email.text.toString().trim()
             val tk = token.text.toString().trim()
             if (bu.isEmpty() || em.isEmpty() || tk.isEmpty()) {
-                status.text = "❌ Preencha Base URL, Email e Token."
+                status.text = getString(R.string.settings_fill_required)
                 return@setOnClickListener
             }
             launch {
                 try {
                     val ok = withContext(Dispatchers.IO) { JiraClient(bu, em, tk).testAuth() }
-                    status.text = if (ok) "✅ Conexão OK" else "❌ Falha de autenticação"
+                    status.text = if (ok) getString(R.string.settings_conn_ok) else getString(R.string.settings_auth_fail)
                 } catch (e: Exception) {
                     status.text = "❌ Erro: ${e.message}"
                 }
@@ -67,9 +72,11 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             val em = email.text.toString().trim()
             val tk = token.text.toString().trim()
             val jq = jql.text.toString().trim()
+            val force = testCardCheck.isChecked
+            val testKey = testIssueKeyEdit.text.toString().trim().ifBlank { "FGC-9683" }
 
             if (bu.isEmpty() || em.isEmpty() || tk.isEmpty()) {
-                status.text = "❌ Base URL, Email e Token são obrigatórios."
+                status.text = getString(R.string.settings_required_missing)
                 return@setOnClickListener
             }
 
@@ -81,10 +88,12 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             p.email = em
             p.token = tk
             p.jql = jq
+            p.forceTestCard = force
+            p.testIssueKey = testKey
             p.alarmTime = "%02d:%02d".format(h, m)
 
             AlarmScheduler.scheduleDaily(this, h, m)
-            status.text = "✔️ Configurações salvas."
+            status.text = getString(R.string.settings_saved_ok)
         }
     }
 }

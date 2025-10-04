@@ -1,0 +1,4 @@
+com.pointdown.app.test.app-androidTest-0 C:\Users\Antonio Nuzzi\PointDownAndroid\app\build\generated\res\resValues\androidTest\debug
+com.pointdown.app.test.app-mergeDebugAndroidTestResources-1 C:\Users\Antonio Nuzzi\PointDownAndroid\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.pointdown.app.test.app-mergeDebugAndroidTestResources-2 C:\Users\Antonio Nuzzi\PointDownAndroid\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.pointdown.app.test.app-debugAndroidTest-3 C:\Users\Antonio Nuzzi\PointDownAndroid\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

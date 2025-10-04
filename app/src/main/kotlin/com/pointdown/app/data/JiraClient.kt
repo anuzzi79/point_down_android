@@ -16,7 +16,7 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
     private val client: OkHttpClient
 
     companion object {
-        private const val SP_FIELD_ID = "customfield_10022" // Story Points
+        private const val SP_FIELD_ID = "customfield_10022" // Story Points (ID fisso come da estensione)
         private val STATUSES = listOf("In Progress", "Blocked", "Need Reqs", "Done")
     }
 
@@ -79,9 +79,11 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
                             key = key,
                             summary = summary,
                             sp = sp,
+                            browseUrl = "${baseUrl.trimEnd('/')}/browse/$key",
                             newSp = sp,
                             dirty = false,
-                            browseUrl = "${baseUrl.trimEnd('/')}/browse/$key"
+                            isSpecial = false,
+                            pts = sp // ✅ baseline “fotografata” al fetch
                         )
                     )
                 }
@@ -117,6 +119,53 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
             """sprint in openSprints() AND (summary ~ "explorat" OR summary ~ "regres" OR summary ~ "regress")"""
         val finalJql = jqlWithStatuses(specialBase)
         return fetchIssuesByJql(finalJql).map { it.copy(isSpecial = true) }
+    }
+
+    /** ✅ Lettura puntuale del valore Story Points corrente (PAS). */
+    suspend fun getCurrentStoryPoints(issueKey: String): Double = withContext(Dispatchers.IO) {
+        val req = Request.Builder()
+            .url("$baseUrl/rest/api/3/issue/$issueKey?fields=$SP_FIELD_ID")
+            .get()
+            .headers(headers())
+            .build()
+
+        client.newCall(req).execute().use { resp ->
+            if (!resp.isSuccessful) {
+                val t = resp.body?.string()
+                throw IllegalStateException("Falha ao obter SP de $issueKey: ${resp.code} ${t ?: ""}")
+            }
+            val data = JSONObject(resp.body?.string() ?: "{}")
+            val fields = data.optJSONObject("fields") ?: JSONObject()
+            fields.optDouble(SP_FIELD_ID, 0.0)
+        }
+    }
+
+    /** ✅ Fetch diretto per una issue (usata per la “card di test”). */
+    suspend fun fetchIssueByKey(issueKey: String): IssueItem? = withContext(Dispatchers.IO) {
+        val req = Request.Builder()
+            .url("$baseUrl/rest/api/3/issue/$issueKey?fields=${"summary,$SP_FIELD_ID"}")
+            .get()
+            .headers(headers())
+            .build()
+
+        client.newCall(req).execute().use { resp ->
+            if (!resp.isSuccessful) return@use null
+            val data = JSONObject(resp.body?.string() ?: "{}")
+            val key = data.optString("key", issueKey)
+            val fields = data.optJSONObject("fields") ?: JSONObject()
+            val summary = fields.optString("summary", "(sem resumo)")
+            val sp = fields.optDouble(SP_FIELD_ID, 0.0)
+            return@use IssueItem(
+                key = key,
+                summary = summary,
+                sp = sp,
+                browseUrl = "${baseUrl.trimEnd('/')}/browse/$key",
+                newSp = sp,
+                dirty = false,
+                isSpecial = false,
+                pts = sp
+            )
+        }
     }
 
     suspend fun updateStoryPoints(issueKey: String, newValue: Double): Boolean =

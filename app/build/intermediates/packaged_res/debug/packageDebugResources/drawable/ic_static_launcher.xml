@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icona launcher statica: fondo bianco + PNG centrata -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fondo bianco pieno -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- PNG della manina (colore originale), con margine -->
+    <item
+        android:top="16dp"
+        android:bottom="16dp"
+        android:left="16dp"
+        android:right="16dp">
+        <bitmap
+            android:src="@drawable/pointing_down"
+            android:gravity="center"/>
+    </item>
+
+</layer-list>

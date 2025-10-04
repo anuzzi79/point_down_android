@@ -25,6 +25,15 @@ class Prefs(ctx: Context) {
         get() = sp.getString("alarmTime", "17:50")
         set(v) = sp.edit().putString("alarmTime", v).apply()
 
+    // ✅ Preferenze per la “card di test” (Chrome-like)
+    var forceTestCard: Boolean
+        get() = sp.getBoolean("forceTestCard", true)
+        set(v) = sp.edit().putBoolean("forceTestCard", v).apply()
+
+    var testIssueKey: String?
+        get() = sp.getString("testIssueKey", "FGC-9683")
+        set(v) = sp.edit().putString("testIssueKey", v).apply()
+
     fun getHourMinute(): Pair<Int, Int> {
         val t = alarmTime ?: "17:50"
         val m = Regex("(\\d{1,2}):(\\d{2})").find(t)

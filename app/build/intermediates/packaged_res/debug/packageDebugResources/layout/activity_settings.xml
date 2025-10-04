@@ -34,10 +34,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- ✅ Opzioni Card di Test -->
+        <CheckBox
+            android:id="@+id/forceTestCardCheck"
+            android:text="@string/settings_force_test_card_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:paddingTop="8dp"/>
+
+        <EditText
+            android:id="@+id/testIssueKeyEdit"
+            android:hint="@string/settings_test_issue_key_hint"
+            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="true"/>
+
         <TimePicker
             android:id="@+id/timePicker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -47,12 +65,12 @@
             android:paddingTop="8dp">
             <Button
                 android:id="@+id/testBtn"
-                android:text="Testar conexão"
+                android:text="@string/settings_test_conn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <Button
                 android:id="@+id/saveBtn"
-                android:text="Salvar"
+                android:text="@string/settings_save_btn"
                 android:layout_marginStart="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
