@@ -3189,6 +3189,8 @@ int id action_text 0x7f080047
 int id actions 0x7f080048
 int id activity_chooser_view_content 0x7f080049
 int id add 0x7f08004a
+int id advancedBtn 0x7f08021b
+int id advancedSection 0x7f08021c
 int id alertTitle 0x7f08004b
 int id aligned 0x7f08004c
 int id all 0x7f08004d
@@ -3300,6 +3302,7 @@ int id elastic 0x7f0800b6
 int id emailEdit 0x7f0800b7
 int id embed 0x7f0800b8
 int id enableQueueLockCheck 0x7f0800b9
+int id enableWeekendCheck 0x7f08021d
 int id end 0x7f0800ba
 int id endToStart 0x7f0800bb
 int id enterAlways 0x7f0800bc
@@ -3606,6 +3609,8 @@ int id textinput_placeholder 0x7f0801e8
 int id textinput_prefix_text 0x7f0801e9
 int id textinput_suffix_text 0x7f0801ea
 int id time 0x7f0801eb
+int id timeBlock 0x7f08021e
+int id timeLabel 0x7f08021f
 int id timePicker 0x7f0801ec
 int id title 0x7f0801ed
 int id titleDividerNoCustom 0x7f0801ee
@@ -3880,6 +3885,7 @@ int string abc_searchview_description_voice 0x7f100017
 int string abc_shareactionprovider_share_with 0x7f100018
 int string abc_shareactionprovider_share_with_application 0x7f100019
 int string abc_toolbar_collapse_description 0x7f10001a
+int string advanced_btn 0x7f1000bb
 int string androidx_startup 0x7f10001b
 int string app_name 0x7f10001c
 int string appbar_scrolling_view_behavior 0x7f10001d
@@ -4025,6 +4031,7 @@ int string searchview_navigation_content_description 0x7f1000a8
 int string settings_auth_fail 0x7f1000a9
 int string settings_conn_ok 0x7f1000aa
 int string settings_enable_queue_lock_title 0x7f1000ab
+int string settings_enable_weekend_title 0x7f1000bc
 int string settings_fill_required 0x7f1000ac
 int string settings_force_test_card_title 0x7f1000ad
 int string settings_required_missing 0x7f1000ae
@@ -4038,6 +4045,7 @@ int string side_sheet_behavior 0x7f1000b5
 int string special_title 0x7f1000b6
 int string status_bar_notification_info_overflow 0x7f1000b7
 int string status_loading 0x7f1000b8
+int string time_block_label 0x7f1000bd
 int string token_info_desc 0x7f1000b9
 int style AlertDialog_AppCompat 0x7f110000
 int style AlertDialog_AppCompat_Light 0x7f110001

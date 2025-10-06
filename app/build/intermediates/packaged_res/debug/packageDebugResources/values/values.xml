@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
+    <string name="advanced_btn">Avançadas</string>
     <string name="app_name">point_down</string>
     <string name="notif_channel_desc">Notificação diária para baixar/sobir Story Points</string>
     <string name="notif_channel_name">point_down lembrete diário</string>
@@ -10,6 +11,7 @@
     <string name="settings_auth_fail">❌ Falha de autenticação</string>
     <string name="settings_conn_ok">✅ Conexão OK</string>
     <string name="settings_enable_queue_lock_title">Ativar fila/lock cooperativo (anti-concorrência) via Jira</string>
+    <string name="settings_enable_weekend_title">Ativar as notificações também sábado e domingo por finalidades de test</string>
     <string name="settings_fill_required">❌ Preencha Base URL, Email e Token.</string>
     <string name="settings_force_test_card_title">Adicionar card de teste (ex.: FGC-9683)</string>
     <string name="settings_required_missing">❌ Base URL, Email e Token são obrigatórios.</string>
@@ -20,6 +22,7 @@
     <string name="settings_testing">Testando…</string>
     <string name="special_title">Você pode estar precisando baixar também pontos destas cards</string>
     <string name="status_loading">Carregando issues da sprint atual…</string>
+    <string name="time_block_label">Decida a que hora quer receber notificação de baixar ponto</string>
     <string name="token_info_desc">Como obter o API Token</string>
     <style name="PointDown.PopupMenu" parent="Widget.Material3.PopupMenu">
         

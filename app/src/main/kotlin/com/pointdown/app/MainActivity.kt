@@ -25,7 +25,6 @@ import com.pointdown.app.ui.IssueAdapter
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.round
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var statusText: TextView
@@ -133,7 +132,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         setStatus(getString(R.string.status_loading))
 
         val (h, m) = prefs.getHourMinute()
-        AlarmScheduler.scheduleDaily(this, h, m)
+        AlarmScheduler.scheduleDaily(this, h, m, prefs.enableWeekendNotifications)
 
         jira = JiraClient(prefs.baseUrl!!, prefs.email!!, prefs.token!!)
         val jql = prefs.jql
@@ -224,7 +223,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                             myLock = try {
                                 jira!!.acquireLockOrWait(issue.key, issue.idNum)
                             } catch (e: Exception) {
-                                // Non bloccare l'intera batch: passa oltre questa issue
                                 Log.w("point_down", "lock failure on ${issue.key}: ${e.message}")
                                 null
                             }
@@ -232,14 +230,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                         try {
                             jira!!.updateStoryPoints(issue.key, np)
-
-                            // Baseline aggiornata subito
                             issue.sp = np
                             issue.newSp = np
                             issue.pts = np
                             issue.dirty = false
                         } finally {
-                            // Rilascio condizionato
                             if (prefs.enableQueueLock) {
                                 runCatching { jira!!.releaseLock(issue.key, issue.idNum, myLock) }
                             }
@@ -254,7 +249,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 if (exitAfter) {
                     finish()
                 } else {
-                    loadData() // refresh dal server, come nel modal Chrome
+                    loadData()
                 }
             } catch (e: Exception) {
                 Log.e("point_down", "❌ Errore no saveChanges", e)
@@ -263,7 +258,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    // Mostra il pulsante Save in toolbar con fade-in dopo edit (opzionale)
     private fun onDirtyChanged() {
         if (saveBtnToolbar.visibility != View.VISIBLE) {
             saveBtnToolbar.visibility = View.VISIBLE

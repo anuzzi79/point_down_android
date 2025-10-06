@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 
 import android.content.Intent
 import android.net.Uri
+import android.view.View
 
 class SettingsActivity : AppCompatActivity(), CoroutineScope {
     private val job = SupervisorJob()
@@ -28,26 +29,29 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         val email = findViewById<EditText>(R.id.emailEdit)
         val token = findViewById<EditText>(R.id.tokenEdit)
         val jql = findViewById<EditText>(R.id.jqlEdit)
+
+        val timePicker = findViewById<TimePicker>(R.id.timePicker)
+        val status = findViewById<TextView>(R.id.statusTextSettings)
+
+        val advancedBtn = findViewById<Button>(R.id.advancedBtn)
+        val advancedSection = findViewById<LinearLayout>(R.id.advancedSection)
         val testCardCheck = findViewById<CheckBox>(R.id.forceTestCardCheck)
         val testIssueKeyEdit = findViewById<EditText>(R.id.testIssueKeyEdit)
         val queueLockCheck = findViewById<CheckBox>(R.id.enableQueueLockCheck)
-        val timePicker = findViewById<TimePicker>(R.id.timePicker)
-        val status = findViewById<TextView>(R.id.statusTextSettings)
+        val weekendCheck = findViewById<CheckBox>(R.id.enableWeekendCheck)
+
         val testBtn = findViewById<Button>(R.id.testBtn)
         val saveBtn = findViewById<Button>(R.id.saveBtn)
         val infoBtn = findViewById<ImageButton>(R.id.infoTokenBtn)
 
+        // Campi base
         baseUrl.setText(prefs.baseUrl)
         email.setText(prefs.email)
         token.setText(prefs.token)
         jql.setText(prefs.jql)
 
-        testCardCheck.isChecked = prefs.forceTestCard
-        testIssueKeyEdit.setText(prefs.testIssueKey ?: "FGC-9683")
-
-        queueLockCheck.isChecked = prefs.enableQueueLock
-
-        val (h0,m0) = prefs.getHourMinute()
+        // Ora (24h) – blocco subito sotto JQL
+        val (h0, m0) = prefs.getHourMinute()
         timePicker.setIs24HourView(true)
         if (Build.VERSION.SDK_INT >= 23) {
             timePicker.hour = h0; timePicker.minute = m0
@@ -61,6 +65,27 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
 
+        // Bottone "Avançadas": toggle mostra/nascondi.
+        // Alla PRIMA apertura imposta tutte le opzioni su ON e precompila la issue key di test.
+        var advancedInitialized = false
+        advancedBtn.setOnClickListener {
+            if (advancedSection.visibility == View.VISIBLE) {
+                advancedSection.visibility = View.GONE
+            } else {
+                advancedSection.visibility = View.VISIBLE
+                if (!advancedInitialized) {
+                    testCardCheck.isChecked = true
+                    queueLockCheck.isChecked = true
+                    weekendCheck.isChecked = true
+                    if (testIssueKeyEdit.text.isNullOrBlank()) {
+                        testIssueKeyEdit.setText(prefs.testIssueKey ?: "FGC-9683")
+                    }
+                    advancedInitialized = true
+                }
+            }
+        }
+
+        // Test connessione
         testBtn.setOnClickListener {
             status.text = getString(R.string.settings_testing)
             val bu = baseUrl.text.toString().trim()
@@ -80,14 +105,12 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             }
         }
 
+        // Salvataggio
         saveBtn.setOnClickListener {
             val bu = baseUrl.text.toString().trim()
             val em = email.text.toString().trim()
             val tk = token.text.toString().trim()
             val jq = jql.text.toString().trim()
-            val force = testCardCheck.isChecked
-            val testKey = testIssueKeyEdit.text.toString().trim().ifBlank { "FGC-9683" }
-            val enableQueueLock = queueLockCheck.isChecked
 
             if (bu.isEmpty() || em.isEmpty() || tk.isEmpty()) {
                 status.text = getString(R.string.settings_required_missing)
@@ -102,12 +125,16 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             p.email = em
             p.token = tk
             p.jql = jq
-            p.forceTestCard = force
-            p.testIssueKey = testKey
-            p.alarmTime = "%02d:%02d".format(h, m)
-            p.enableQueueLock = enableQueueLock
 
-            AlarmScheduler.scheduleDaily(this, h, m)
+            // Opzioni avanzate
+            p.forceTestCard = testCardCheck.isChecked
+            p.testIssueKey = (testIssueKeyEdit.text?.toString()?.trim().takeUnless { it.isNullOrBlank() } ?: "FGC-9683")
+            p.enableQueueLock = queueLockCheck.isChecked
+            p.enableWeekendNotifications = weekendCheck.isChecked
+
+            p.alarmTime = "%02d:%02d".format(h, m)
+
+            AlarmScheduler.scheduleDaily(this, h, m, p.enableWeekendNotifications)
             status.text = getString(R.string.settings_saved_ok)
         }
     }

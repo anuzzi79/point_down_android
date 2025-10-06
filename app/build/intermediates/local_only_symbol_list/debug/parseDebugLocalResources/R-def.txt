@@ -14,11 +14,14 @@ drawable refresh
 id action_refresh
 id action_save
 id action_settings
+id advancedBtn
+id advancedSection
 id baseUrlEdit
 id dirtyText
 id downBtn
 id emailEdit
 id enableQueueLockCheck
+id enableWeekendCheck
 id footerBar
 id footerExitBtn
 id footerSaveBtn
@@ -38,6 +41,8 @@ id statusTextSettings
 id summaryText
 id testBtn
 id testIssueKeyEdit
+id timeBlock
+id timeLabel
 id timePicker
 id tokenEdit
 id toolbar
@@ -49,6 +54,7 @@ menu main_menu
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round
+string advanced_btn
 string app_name
 string notif_channel_desc
 string notif_channel_name
@@ -58,6 +64,7 @@ string open_in_browser
 string settings_auth_fail
 string settings_conn_ok
 string settings_enable_queue_lock_title
+string settings_enable_weekend_title
 string settings_fill_required
 string settings_force_test_card_title
 string settings_required_missing
@@ -68,6 +75,7 @@ string settings_test_issue_key_hint
 string settings_testing
 string special_title
 string status_loading
+string time_block_label
 string token_info_desc
 style PointDown.PopupMenu
 style ThemeOverlay.PointDown.DarkPopup

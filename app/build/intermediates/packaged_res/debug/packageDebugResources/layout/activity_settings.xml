@@ -59,58 +59,119 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <!-- ✅ Opzioni Card di Test -->
-        <CheckBox
-            android:id="@+id/forceTestCardCheck"
-            android:text="@string/settings_force_test_card_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:paddingTop="8dp"/>
-
-        <EditText
-            android:id="@+id/testIssueKeyEdit"
-            android:hint="@string/settings_test_issue_key_hint"
-            android:inputType="text"
+        <!-- BLOCCO ORA: testo a sinistra, timepicker a destra (subito sotto JQL) -->
+        <LinearLayout
+            android:id="@+id/timeBlock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="true"/>
+            android:orientation="horizontal"
+            android:paddingTop="16dp">
 
-        <!-- ✅ Attiva/Disattiva lock cooperativo -->
-        <CheckBox
-            android:id="@+id/enableQueueLockCheck"
-            android:text="@string/settings_enable_queue_lock_title"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/timeLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time_block_label"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:lineSpacingExtra="2dp"/>
+
+            <TimePicker
+                android:id="@+id/timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"
+                android:layout_marginStart="16dp"/>
+        </LinearLayout>
+
+        <!-- Sezione AVANZATE (nascosta finché non si preme il bottone “Avançadas”) -->
+        <LinearLayout
+            android:id="@+id/advancedSection"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:paddingTop="8dp"/>
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:visibility="gone">
 
-        <TimePicker
-            android:id="@+id/timePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:timePickerMode="spinner" />
+            <!-- ✅ Opzioni Card di Test -->
+            <CheckBox
+                android:id="@+id/forceTestCardCheck"
+                android:text="@string/settings_force_test_card_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:paddingTop="8dp"/>
 
+            <EditText
+                android:id="@+id/testIssueKeyEdit"
+                android:hint="@string/settings_test_issue_key_hint"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="true"/>
+
+            <!-- ✅ Attiva/Disattiva lock cooperativo -->
+            <CheckBox
+                android:id="@+id/enableQueueLockCheck"
+                android:text="@string/settings_enable_queue_lock_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:paddingTop="8dp"/>
+
+            <!-- ✅ Nuova opzione: weekend -->
+            <CheckBox
+                android:id="@+id/enableWeekendCheck"
+                android:text="@string/settings_enable_weekend_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:paddingTop="8dp"/>
+        </LinearLayout>
+
+        <!-- Footer con TRE bottoni equidistanziati e testo su UNA riga (no sillabazione/troncatura) -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:paddingTop="8dp">
+            android:gravity="center"
+            android:paddingTop="24dp">
+
+            <Button
+                android:id="@+id/advancedBtn"
+                android:text="@string/advanced_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="none"
+                android:hyphenationFrequency="none"/>
 
             <Button
                 android:id="@+id/testBtn"
                 android:text="@string/settings_test_conn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="none"
+                android:hyphenationFrequency="none"/>
 
             <Button
                 android:id="@+id/saveBtn"
                 android:text="@string/settings_save_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="none"
+                android:hyphenationFrequency="none"/>
         </LinearLayout>
 
         <TextView

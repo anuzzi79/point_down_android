@@ -15,8 +15,8 @@ import com.pointdown.app.data.Prefs
 class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         val prefs = Prefs(context)
-        val (h,m) = prefs.getHourMinute()
-        AlarmScheduler.scheduleDaily(context, h, m)
+        val (h, m) = prefs.getHourMinute()
+        AlarmScheduler.scheduleDaily(context, h, m, prefs.enableWeekendNotifications)
 
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "pointdown_daily"
@@ -42,15 +42,12 @@ class NotificationReceiver : BroadcastReceiver() {
         )
 
         val notif = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_popup_reminder) // sicura in tutti i device
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setContentTitle(context.getString(R.string.notif_title))
             .setContentText(context.getString(R.string.notif_text))
             .setContentIntent(contentPI)
             .setAutoCancel(true)
             .build()
-
-
-
 
         nm.notify(1001, notif)
     }

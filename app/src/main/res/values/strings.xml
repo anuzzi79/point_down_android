@@ -26,6 +26,15 @@
     <!-- ✅ Nuovo: toggle lock cooperativo -->
     <string name="settings_enable_queue_lock_title">Ativar fila/lock cooperativo (anti-concorrência) via Jira</string>
 
+    <!-- ✅ Nuovo: weekend notifications -->
+    <string name="settings_enable_weekend_title">Ativar as notificações também sábado e domingo por finalidades de test</string>
+
+    <!-- ✅ Etichetta blocco ora -->
+    <string name="time_block_label">Decida a que hora quer receber notificação de baixar ponto</string>
+
+    <!-- ✅ Bottone sezione avanzate -->
+    <string name="advanced_btn">Avançadas</string>
+
     <!-- ✅ Descrizione icona info token -->
     <string name="token_info_desc">Como obter o API Token</string>
 </resources>

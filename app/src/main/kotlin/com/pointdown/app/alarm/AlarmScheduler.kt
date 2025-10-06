@@ -9,7 +9,7 @@ import java.util.*
 
 object AlarmScheduler {
 
-    fun scheduleDaily(context: Context, hour: Int, minute: Int) {
+    fun scheduleDaily(context: Context, hour: Int, minute: Int, allowWeekend: Boolean) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, NotificationReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
@@ -27,6 +27,18 @@ object AlarmScheduler {
             set(Calendar.MILLISECOND, 0)
             if (before(Calendar.getInstance())) {
                 add(Calendar.DAY_OF_MONTH, 1)
+            }
+        }
+
+        // Se weekend disabilitato, salta a lunedì
+        fun isWeekend(cal: Calendar): Boolean {
+            val d = cal.get(Calendar.DAY_OF_WEEK)
+            return d == Calendar.SATURDAY || d == Calendar.SUNDAY
+        }
+
+        if (!allowWeekend) {
+            while (isWeekend(calendar)) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
             }
         }
 

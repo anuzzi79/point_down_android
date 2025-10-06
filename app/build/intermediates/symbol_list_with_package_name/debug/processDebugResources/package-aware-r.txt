@@ -3190,6 +3190,8 @@ id action_text
 id actions
 id activity_chooser_view_content
 id add
+id advancedBtn
+id advancedSection
 id alertTitle
 id aligned
 id all
@@ -3301,6 +3303,7 @@ id elastic
 id emailEdit
 id embed
 id enableQueueLockCheck
+id enableWeekendCheck
 id end
 id endToStart
 id enterAlways
@@ -3607,6 +3610,8 @@ id textinput_placeholder
 id textinput_prefix_text
 id textinput_suffix_text
 id time
+id timeBlock
+id timeLabel
 id timePicker
 id title
 id titleDividerNoCustom
@@ -3881,6 +3886,7 @@ string abc_searchview_description_voice
 string abc_shareactionprovider_share_with
 string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
+string advanced_btn
 string androidx_startup
 string app_name
 string appbar_scrolling_view_behavior
@@ -4026,6 +4032,7 @@ string searchview_navigation_content_description
 string settings_auth_fail
 string settings_conn_ok
 string settings_enable_queue_lock_title
+string settings_enable_weekend_title
 string settings_fill_required
 string settings_force_test_card_title
 string settings_required_missing
@@ -4039,6 +4046,7 @@ string side_sheet_behavior
 string special_title
 string status_bar_notification_info_overflow
 string status_loading
+string time_block_label
 string token_info_desc
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

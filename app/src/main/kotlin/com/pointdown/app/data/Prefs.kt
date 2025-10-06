@@ -6,7 +6,6 @@ class Prefs(ctx: Context) {
     private val sp = ctx.getSharedPreferences("pd_prefs", Context.MODE_PRIVATE)
 
     var baseUrl: String?
-        // ✅ Default pre-popolato con il tuo tenant Jira
         get() = sp.getString("baseUrl", "https://facilitygrid.atlassian.net")
         set(v) = sp.edit().putString("baseUrl", v).apply()
 
@@ -35,10 +34,15 @@ class Prefs(ctx: Context) {
         get() = sp.getString("testIssueKey", "FGC-9683")
         set(v) = sp.edit().putString("testIssueKey", v).apply()
 
-    // ✅ Abilita/disabilita il lock cooperativo (default: ON)
+    // ✅ Lock cooperativo (default ON)
     var enableQueueLock: Boolean
         get() = sp.getBoolean("enableQueueLock", true)
         set(v) = sp.edit().putBoolean("enableQueueLock", v).apply()
+
+    // ✅ Nuova preferenza: notifiche anche nel weekend (default OFF: si abilita dalla sezione Avançadas)
+    var enableWeekendNotifications: Boolean
+        get() = sp.getBoolean("enableWeekendNotifications", false)
+        set(v) = sp.edit().putBoolean("enableWeekendNotifications", v).apply()
 
     fun getHourMinute(): Pair<Int, Int> {
         val t = alarmTime ?: "17:50"
