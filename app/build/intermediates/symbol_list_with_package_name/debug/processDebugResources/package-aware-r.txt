@@ -4373,6 +4373,7 @@ style Platform_V25_AppCompat
 style Platform_V25_AppCompat_Light
 style Platform_Widget_AppCompat_Spinner
 style PointDown_PopupMenu
+style PointDown_TimePickerText
 style RtlOverlay_DialogWindowTitle_AppCompat
 style RtlOverlay_Widget_AppCompat_ActionBar_TitleItem
 style RtlOverlay_Widget_AppCompat_DialogTitle_Icon

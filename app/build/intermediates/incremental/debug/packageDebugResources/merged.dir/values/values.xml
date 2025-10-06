@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <string name="advanced_btn">Avançadas</string>
+    <string name="app_name">point_down</string>
+    <string name="notif_channel_desc">Notificação diária para baixar/sobir Story Points</string>
+    <string name="notif_channel_name">point_down lembrete diário</string>
+    <string name="notif_text">Toque para abrir o point_down e ajustar os Story Points.</string>
+    <string name="notif_title">Precisa baixar o ponto</string>
+    <string name="open_in_browser">Abrir</string>
+    <string name="settings_auth_fail">❌ Falha de autenticação</string>
+    <string name="settings_conn_ok">✅ Conexão OK</string>
+    <string name="settings_enable_queue_lock_title">Ativar fila/lock cooperativo (anti-concorrência) via Jira</string>
+    <string name="settings_enable_weekend_title">Ativar as notificações também sábado e domingo por finalidades de test</string>
+    <string name="settings_fill_required">❌ Preencha Base URL, Email e Token.</string>
+    <string name="settings_force_test_card_title">Adicionar card de teste (ex.: FGC-9683)</string>
+    <string name="settings_required_missing">❌ Base URL, Email e Token são obrigatórios.</string>
+    <string name="settings_save_btn">Salvar</string>
+    <string name="settings_saved_ok">✔️ Configurações salvas.</string>
+    <string name="settings_test_conn">Testar conexão</string>
+    <string name="settings_test_issue_key_hint">Issue key de teste (ex.: FGC-9683)</string>
+    <string name="settings_testing">Testando…</string>
+    <string name="special_title">Você pode estar precisando baixar também pontos destas cards</string>
+    <string name="status_loading">Carregando issues da sprint atual…</string>
+    <string name="time_block_label">Decida a que hora quer receber notificação de baixar ponto</string>
+    <string name="token_info_desc">Como obter o API Token</string>
+    <style name="PointDown.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/pd_popup_bg</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="listPreferredItemHeightSmall">48dp</item>
+    </style>
+    <style name="PointDown.TimePickerText" parent="ThemeOverlay.Material3.Dark">
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#E0E0E0</item>
+    </style>
+    <style name="ThemeOverlay.PointDown.DarkPopup" parent="ThemeOverlay.Material3.Dark">
+        <item name="popupMenuStyle">@style/PointDown.PopupMenu</item>
+    </style>
+</resources>

@@ -78,4 +78,5 @@ string status_loading
 string time_block_label
 string token_info_desc
 style PointDown.PopupMenu
+style PointDown.TimePickerText
 style ThemeOverlay.PointDown.DarkPopup

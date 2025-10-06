@@ -25,15 +25,15 @@
     <string name="time_block_label">Decida a que hora quer receber notificação de baixar ponto</string>
     <string name="token_info_desc">Como obter o API Token</string>
     <style name="PointDown.PopupMenu" parent="Widget.Material3.PopupMenu">
-        
         <item name="android:popupBackground">@drawable/pd_popup_bg</item>
-        
         <item name="android:textColor">@android:color/white</item>
-        
         <item name="listPreferredItemHeightSmall">48dp</item>
     </style>
+    <style name="PointDown.TimePickerText" parent="ThemeOverlay.Material3.Dark">
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#E0E0E0</item>
+    </style>
     <style name="ThemeOverlay.PointDown.DarkPopup" parent="ThemeOverlay.Material3.Dark">
-        
         <item name="popupMenuStyle">@style/PointDown.PopupMenu</item>
     </style>
 </resources>

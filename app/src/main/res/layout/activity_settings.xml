@@ -2,18 +2,22 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#000000">
 
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#000000">
 
         <EditText
             android:id="@+id/baseUrlEdit"
             android:hint="Jira Base URL (https://tenant.atlassian.net)"
             android:inputType="textUri"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#9AA0A6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -21,6 +25,8 @@
             android:id="@+id/emailEdit"
             android:hint="Email"
             android:inputType="textEmailAddress"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#9AA0A6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -35,6 +41,8 @@
                 android:id="@+id/tokenEdit"
                 android:hint="API Token"
                 android:inputType="textPassword"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#9AA0A6"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
@@ -56,6 +64,8 @@
         <EditText
             android:id="@+id/jqlEdit"
             android:hint='JQL (opcional, para filtrar os cards)'
+            android:textColor="#FFFFFF"
+            android:textColorHint="#9AA0A6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -82,10 +92,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:timePickerMode="spinner"
-                android:layout_marginStart="16dp"/>
+                android:layout_marginStart="16dp"
+                android:theme="@style/PointDown.TimePickerText"/>
         </LinearLayout>
 
-        <!-- Sezione AVANZATE (nascosta finché non si preme il bottone “Avançadas”) -->
+        <!-- Sezione AVANZATE (toggle, nascosta di default) -->
         <LinearLayout
             android:id="@+id/advancedSection"
             android:layout_width="match_parent"
@@ -94,10 +105,10 @@
             android:paddingTop="16dp"
             android:visibility="gone">
 
-            <!-- ✅ Opzioni Card di Test -->
             <CheckBox
                 android:id="@+id/forceTestCardCheck"
                 android:text="@string/settings_force_test_card_title"
+                android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
@@ -107,30 +118,32 @@
                 android:id="@+id/testIssueKeyEdit"
                 android:hint="@string/settings_test_issue_key_hint"
                 android:inputType="text"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#9AA0A6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="true"/>
 
-            <!-- ✅ Attiva/Disattiva lock cooperativo -->
             <CheckBox
                 android:id="@+id/enableQueueLockCheck"
                 android:text="@string/settings_enable_queue_lock_title"
+                android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:paddingTop="8dp"/>
 
-            <!-- ✅ Nuova opzione: weekend -->
             <CheckBox
                 android:id="@+id/enableWeekendCheck"
                 android:text="@string/settings_enable_weekend_title"
+                android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:paddingTop="8dp"/>
         </LinearLayout>
 
-        <!-- Footer con TRE bottoni equidistanziati e testo su UNA riga (no sillabazione/troncatura) -->
+        <!-- Footer con TRE bottoni: più spazio ai primi due -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -141,44 +154,74 @@
             <Button
                 android:id="@+id/advancedBtn"
                 android:text="@string/advanced_btn"
+                android:textColor="#FFFFFF"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="1.3"
                 android:gravity="center"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="none"
-                android:hyphenationFrequency="none"/>
+                android:hyphenationFrequency="none"
+                android:breakStrategy="balanced"
+                android:includeFontPadding="false"
+                android:minHeight="48dp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="18dp"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeMaxTextSize="16sp"
+                app:autoSizeStepGranularity="1sp"/>
 
             <Button
                 android:id="@+id/testBtn"
                 android:text="@string/settings_test_conn"
+                android:textColor="#FFFFFF"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1.3"
                 android:gravity="center"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="none"
-                android:hyphenationFrequency="none"/>
+                android:hyphenationFrequency="none"
+                android:breakStrategy="balanced"
+                android:includeFontPadding="false"
+                android:minHeight="48dp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="18dp"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeMaxTextSize="16sp"
+                app:autoSizeStepGranularity="1sp"/>
 
             <Button
                 android:id="@+id/saveBtn"
                 android:text="@string/settings_save_btn"
+                android:textColor="#FFFFFF"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_weight="0.9"
                 android:gravity="center"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="none"
-                android:hyphenationFrequency="none"/>
+                android:hyphenationFrequency="none"
+                android:breakStrategy="balanced"
+                android:includeFontPadding="false"
+                android:minHeight="48dp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="18dp"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeMaxTextSize="16sp"
+                app:autoSizeStepGranularity="1sp"/>
         </LinearLayout>
 
         <TextView
             android:id="@+id/statusTextSettings"
             android:paddingTop="8dp"
+            android:textColor="#FFFFFF"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-
     </LinearLayout>
 </ScrollView>
