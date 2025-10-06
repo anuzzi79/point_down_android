@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
@@ -21,12 +24,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <EditText
-            android:id="@+id/tokenEdit"
-            android:hint="API Token"
-            android:inputType="textPassword"
+        <!-- Riga orizzontale: campo API Token + pulsante info -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/tokenEdit"
+                android:hint="API Token"
+                android:inputType="textPassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/infoTokenBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:contentDescription="@string/token_info_desc"
+                android:src="@drawable/info_icon"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                app:tint="@null"/>
+        </LinearLayout>
 
         <EditText
             android:id="@+id/jqlEdit"
@@ -51,11 +76,21 @@
             android:layout_height="wrap_content"
             android:enabled="true"/>
 
+        <!-- ✅ Attiva/Disattiva lock cooperativo -->
+        <CheckBox
+            android:id="@+id/enableQueueLockCheck"
+            android:text="@string/settings_enable_queue_lock_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:paddingTop="8dp"/>
+
         <TimePicker
             android:id="@+id/timePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"/>
+            android:paddingTop="8dp"
+            android:timePickerMode="spinner" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -63,11 +98,13 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:paddingTop="8dp">
+
             <Button
                 android:id="@+id/testBtn"
                 android:text="@string/settings_test_conn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+
             <Button
                 android:id="@+id/saveBtn"
                 android:text="@string/settings_save_btn"

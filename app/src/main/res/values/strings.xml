@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">point_down</string>
     <string name="status_loading">Carregando issues da sprint atual…</string>
@@ -21,4 +22,10 @@
     <string name="settings_auth_fail">❌ Falha de autenticação</string>
     <string name="settings_required_missing">❌ Base URL, Email e Token são obrigatórios.</string>
     <string name="settings_saved_ok">✔️ Configurações salvas.</string>
+
+    <!-- ✅ Nuovo: toggle lock cooperativo -->
+    <string name="settings_enable_queue_lock_title">Ativar fila/lock cooperativo (anti-concorrência) via Jira</string>
+
+    <!-- ✅ Descrizione icona info token -->
+    <string name="token_info_desc">Como obter o API Token</string>
 </resources>

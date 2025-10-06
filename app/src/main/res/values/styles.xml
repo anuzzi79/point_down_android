@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Overlay applicato solo ai popup della Toolbar -->
+    <style name="ThemeOverlay.PointDown.DarkPopup" parent="ThemeOverlay.Material3.Dark">
+        <!-- Tutte le popup menu in questa Toolbar useranno questo stile -->
+        <item name="popupMenuStyle">@style/PointDown.PopupMenu</item>
+    </style>
+
+    <!-- Stile del menu a tendina -->
+    <style name="PointDown.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <!-- Sfondo nero personalizzato -->
+        <item name="android:popupBackground">@drawable/pd_popup_bg</item>
+        <!-- Forza testo chiaro per visibilità su nero -->
+        <item name="android:textColor">@android:color/white</item>
+        <!-- Altezza un po' più comoda degli items -->
+        <item name="listPreferredItemHeightSmall">48dp</item>
+    </style>
+
+</resources>

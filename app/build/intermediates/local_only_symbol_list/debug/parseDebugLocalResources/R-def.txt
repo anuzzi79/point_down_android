@@ -6,7 +6,11 @@ drawable ic_launcher_bg_white
 drawable ic_launcher_foreground
 drawable ic_notification
 drawable ic_static_launcher
+drawable info_icon
+drawable informations
+drawable pd_popup_bg
 drawable pointing_down
+drawable refresh
 id action_refresh
 id action_save
 id action_settings
@@ -14,11 +18,13 @@ id baseUrlEdit
 id dirtyText
 id downBtn
 id emailEdit
+id enableQueueLockCheck
 id footerBar
 id footerExitBtn
 id footerSaveBtn
 id footerSaveExitBtn
 id forceTestCardCheck
+id infoTokenBtn
 id jqlEdit
 id keyText
 id recyclerMain
@@ -51,6 +57,7 @@ string notif_title
 string open_in_browser
 string settings_auth_fail
 string settings_conn_ok
+string settings_enable_queue_lock_title
 string settings_fill_required
 string settings_force_test_card_title
 string settings_required_missing
@@ -61,3 +68,6 @@ string settings_test_issue_key_hint
 string settings_testing
 string special_title
 string status_loading
+string token_info_desc
+style PointDown.PopupMenu
+style ThemeOverlay.PointDown.DarkPopup

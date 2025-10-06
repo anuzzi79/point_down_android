@@ -9,6 +9,7 @@
     <string name="open_in_browser">Abrir</string>
     <string name="settings_auth_fail">❌ Falha de autenticação</string>
     <string name="settings_conn_ok">✅ Conexão OK</string>
+    <string name="settings_enable_queue_lock_title">Ativar fila/lock cooperativo (anti-concorrência) via Jira</string>
     <string name="settings_fill_required">❌ Preencha Base URL, Email e Token.</string>
     <string name="settings_force_test_card_title">Adicionar card de teste (ex.: FGC-9683)</string>
     <string name="settings_required_missing">❌ Base URL, Email e Token são obrigatórios.</string>
@@ -19,4 +20,17 @@
     <string name="settings_testing">Testando…</string>
     <string name="special_title">Você pode estar precisando baixar também pontos destas cards</string>
     <string name="status_loading">Carregando issues da sprint atual…</string>
+    <string name="token_info_desc">Como obter o API Token</string>
+    <style name="PointDown.PopupMenu" parent="Widget.Material3.PopupMenu">
+        
+        <item name="android:popupBackground">@drawable/pd_popup_bg</item>
+        
+        <item name="android:textColor">@android:color/white</item>
+        
+        <item name="listPreferredItemHeightSmall">48dp</item>
+    </style>
+    <style name="ThemeOverlay.PointDown.DarkPopup" parent="ThemeOverlay.Material3.Dark">
+        
+        <item name="popupMenuStyle">@style/PointDown.PopupMenu</item>
+    </style>
 </resources>

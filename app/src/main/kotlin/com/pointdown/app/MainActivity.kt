@@ -23,7 +23,9 @@ import com.pointdown.app.data.JiraClient
 import com.pointdown.app.data.Prefs
 import com.pointdown.app.ui.IssueAdapter
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.round
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var statusText: TextView
@@ -143,18 +145,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                 withContext(Dispatchers.IO) {
                     val finalMain = jira!!.fetchCurrentSprintIssues(jql)
-                    Log.e("point_down", "✅ JQL finale usato: ${jql ?: "default"}")
-                    Log.e("point_down", "📊 Main JQL -> trovate ${finalMain.size} cards")
-
                     val spec = jira!!.fetchSpecialSprintIssues()
-                    Log.e("point_down", "📊 Special JQL -> trovate ${spec.size} cards")
 
                     mainList = finalMain.toMutableList()
                     val dedupSpecial = spec.filter { s -> finalMain.none { it.key == s.key } }
                     specialList = dedupSpecial.toMutableList()
                 }
 
-                // Card di test opzionale (Chrome-like)
+                // Card di test opzionale
                 val force = prefs.forceTestCard
                 val forcedKey = (prefs.testIssueKey ?: "FGC-9683").ifBlank { "FGC-9683" }
                 if (force) {
@@ -163,17 +161,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         if (!alreadyKeys.contains(forcedKey)) {
                             val forced = withContext(Dispatchers.IO) { jira!!.fetchIssueByKey(forcedKey) }
                             if (forced != null) {
-                                Log.e("point_down", "🧪 Card di test aggiunta: $forcedKey")
                                 mainList.add(0, forced)
-                            } else {
-                                Log.e("point_down", "🧪 Nessuna card di test trovata per key=$forcedKey")
                             }
-                        } else {
-                            Log.e("point_down", "🧪 Card di test già presente: $forcedKey")
                         }
-                    } catch (e: Exception) {
-                        Log.e("point_down", "🧪 Errore fetch card di test $forcedKey", e)
-                    }
+                    } catch (_: Exception) { /* no-op */ }
                 }
 
                 itemsMain.clear(); itemsMain.addAll(mainList)
@@ -199,6 +190,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun saveChanges(exitAfter: Boolean) {
+        val prefs = Prefs(this)
         val toSave = (itemsMain + itemsSpecial).filter { it.dirty && it.newSp != it.sp }
         if (toSave.isEmpty()) {
             setStatus("Nada para salvar.")
@@ -214,7 +206,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         val userNew = issue.newSp
                         val lova = pts - userNew
 
-                        val pas = jira!!.getCurrentStoryPoints(issue.key)
+                        // Rilettura server + id
+                        val (idNumFromSrv, pas) = jira!!.getCurrentSPAndId(issue.key)
+                        if (issue.idNum == null && idNumFromSrv != null) issue.idNum = idNumFromSrv
 
                         fun clampHalfNonNeg(v: Double): Double {
                             val r = kotlin.math.round(v * 2.0) / 2.0
@@ -224,25 +218,43 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         val np = if (pas == pts) clampHalfNonNeg(userNew)
                         else clampHalfNonNeg(pas - lova)
 
-                        jira!!.updateStoryPoints(issue.key, np)
+                        // === Corridoio / Lock cooperativo (se abilitato) ===
+                        var myLock: JSONObject? = null
+                        if (prefs.enableQueueLock) {
+                            myLock = try {
+                                jira!!.acquireLockOrWait(issue.key, issue.idNum)
+                            } catch (e: Exception) {
+                                // Non bloccare l'intera batch: passa oltre questa issue
+                                Log.w("point_down", "lock failure on ${issue.key}: ${e.message}")
+                                null
+                            }
+                        }
 
-                        // Baseline aggiornata subito (Chrome-like)
-                        issue.sp = np
-                        issue.newSp = np
-                        issue.pts = np
-                        issue.dirty = false
+                        try {
+                            jira!!.updateStoryPoints(issue.key, np)
+
+                            // Baseline aggiornata subito
+                            issue.sp = np
+                            issue.newSp = np
+                            issue.pts = np
+                            issue.dirty = false
+                        } finally {
+                            // Rilascio condizionato
+                            if (prefs.enableQueueLock) {
+                                runCatching { jira!!.releaseLock(issue.key, issue.idNum, myLock) }
+                            }
+                        }
                     }
                 }
                 adapterMain?.notifyDataSetChanged()
                 adapterSpecial?.notifyDataSetChanged()
                 setStatus("✅ ${toSave.size} issue(s) atualizadas.")
-                saveBtnToolbar.visibility = View.GONE
 
+                saveBtnToolbar.visibility = View.GONE
                 if (exitAfter) {
                     finish()
                 } else {
-                    // Aggiorna dal server come nel modal Chrome dopo “Save”
-                    loadData()
+                    loadData() // refresh dal server, come nel modal Chrome
                 }
             } catch (e: Exception) {
                 Log.e("point_down", "❌ Errore no saveChanges", e)

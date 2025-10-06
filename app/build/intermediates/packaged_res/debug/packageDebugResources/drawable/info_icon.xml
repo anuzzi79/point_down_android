@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wrapper XML che usa il PNG azzurrino originale come bitmap.
+     Così manteniamo un drawable XML (se serve per consistenza) ma
+     l’immagine mostrata è esattamente quella del file PNG. -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/informations"
+    android:gravity="center" />

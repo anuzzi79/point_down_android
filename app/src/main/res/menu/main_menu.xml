@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_refresh" android:title="Recarregar"/>
-    <item android:id="@+id/action_save" android:title="Save"/>
-    <item android:id="@+id/action_settings" android:title="Settings"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Mostrato come icona nella Toolbar, a sinistra dei tre puntini -->
+    <item
+        android:id="@+id/action_refresh"
+        android:title="Recarregar"
+        android:icon="@drawable/refresh"
+        app:showAsAction="always" />
+
+    <!-- Restano nel menu overflow -->
+    <item
+        android:id="@+id/action_save"
+        android:title="Save" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings" />
 </menu>

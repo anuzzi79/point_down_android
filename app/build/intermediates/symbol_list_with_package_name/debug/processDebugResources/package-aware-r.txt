@@ -3035,6 +3035,8 @@ drawable ic_notification
 drawable ic_search_black_24
 drawable ic_static_launcher
 drawable indeterminate_static
+drawable info_icon
+drawable informations
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
 drawable m3_bottom_sheet_drag_handle
@@ -3107,7 +3109,9 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable pd_popup_bg
 drawable pointing_down
+drawable refresh
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -3296,6 +3300,7 @@ id edit_text_id
 id elastic
 id emailEdit
 id embed
+id enableQueueLockCheck
 id end
 id endToStart
 id enterAlways
@@ -3352,6 +3357,7 @@ id immediateStop
 id included
 id indeterminate
 id info
+id infoTokenBtn
 id invisible
 id inward
 id is_pooling_container_tag
@@ -4019,6 +4025,7 @@ string searchview_clear_text_content_description
 string searchview_navigation_content_description
 string settings_auth_fail
 string settings_conn_ok
+string settings_enable_queue_lock_title
 string settings_fill_required
 string settings_force_test_card_title
 string settings_required_missing
@@ -4032,6 +4039,7 @@ string side_sheet_behavior
 string special_title
 string status_bar_notification_info_overflow
 string status_loading
+string token_info_desc
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
 style Animation_AppCompat_Dialog
@@ -4356,6 +4364,7 @@ style Platform_V21_AppCompat_Light
 style Platform_V25_AppCompat
 style Platform_V25_AppCompat_Light
 style Platform_Widget_AppCompat_Spinner
+style PointDown_PopupMenu
 style RtlOverlay_DialogWindowTitle_AppCompat
 style RtlOverlay_Widget_AppCompat_ActionBar_TitleItem
 style RtlOverlay_Widget_AppCompat_DialogTitle_Icon
@@ -4774,6 +4783,7 @@ style ThemeOverlay_MaterialComponents_TimePicker_Display_TextInputEditText
 style ThemeOverlay_MaterialComponents_Toolbar_Popup_Primary
 style ThemeOverlay_MaterialComponents_Toolbar_Primary
 style ThemeOverlay_MaterialComponents_Toolbar_Surface
+style ThemeOverlay_PointDown_DarkPopup
 style Widget_AppCompat_ActionBar
 style Widget_AppCompat_ActionBar_Solid
 style Widget_AppCompat_ActionBar_TabBar

@@ -9,6 +9,9 @@ import com.pointdown.app.data.JiraClient
 import com.pointdown.app.data.Prefs
 import kotlinx.coroutines.*
 
+import android.content.Intent
+import android.net.Uri
+
 class SettingsActivity : AppCompatActivity(), CoroutineScope {
     private val job = SupervisorJob()
     override val coroutineContext = Dispatchers.Main + job
@@ -27,10 +30,12 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         val jql = findViewById<EditText>(R.id.jqlEdit)
         val testCardCheck = findViewById<CheckBox>(R.id.forceTestCardCheck)
         val testIssueKeyEdit = findViewById<EditText>(R.id.testIssueKeyEdit)
+        val queueLockCheck = findViewById<CheckBox>(R.id.enableQueueLockCheck)
         val timePicker = findViewById<TimePicker>(R.id.timePicker)
         val status = findViewById<TextView>(R.id.statusTextSettings)
         val testBtn = findViewById<Button>(R.id.testBtn)
         val saveBtn = findViewById<Button>(R.id.saveBtn)
+        val infoBtn = findViewById<ImageButton>(R.id.infoTokenBtn)
 
         baseUrl.setText(prefs.baseUrl)
         email.setText(prefs.email)
@@ -40,12 +45,20 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         testCardCheck.isChecked = prefs.forceTestCard
         testIssueKeyEdit.setText(prefs.testIssueKey ?: "FGC-9683")
 
+        queueLockCheck.isChecked = prefs.enableQueueLock
+
         val (h0,m0) = prefs.getHourMinute()
         timePicker.setIs24HourView(true)
         if (Build.VERSION.SDK_INT >= 23) {
             timePicker.hour = h0; timePicker.minute = m0
         } else {
             timePicker.currentHour = h0; timePicker.currentMinute = m0
+        }
+
+        // 🔗 Aiuto: apre il video YouTube con le istruzioni del token
+        infoBtn.setOnClickListener {
+            val url = "https://youtu.be/X1F5LfCuq6I"
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
 
         testBtn.setOnClickListener {
@@ -74,6 +87,7 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             val jq = jql.text.toString().trim()
             val force = testCardCheck.isChecked
             val testKey = testIssueKeyEdit.text.toString().trim().ifBlank { "FGC-9683" }
+            val enableQueueLock = queueLockCheck.isChecked
 
             if (bu.isEmpty() || em.isEmpty() || tk.isEmpty()) {
                 status.text = getString(R.string.settings_required_missing)
@@ -91,6 +105,7 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             p.forceTestCard = force
             p.testIssueKey = testKey
             p.alarmTime = "%02d:%02d".format(h, m)
+            p.enableQueueLock = enableQueueLock
 
             AlarmScheduler.scheduleDaily(this, h, m)
             status.text = getString(R.string.settings_saved_ok)
