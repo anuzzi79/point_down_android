@@ -1,11 +1,15 @@
 package com.pointdown.app
 
 import android.Manifest
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -28,12 +32,9 @@ import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var statusText: TextView
-    private lateinit var recyclerMain: RecyclerView
-    private lateinit var recyclerSpecial: RecyclerView
-    private lateinit var specialTitle: TextView
+    private lateinit var recyclerUnified: RecyclerView
     private lateinit var saveBtnToolbar: Button
 
-    // Footer buttons
     private lateinit var footerSaveBtn: Button
     private lateinit var footerSaveExitBtn: Button
     private lateinit var footerExitBtn: Button
@@ -41,16 +42,17 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext = Dispatchers.Main + job
 
-    private var adapterMain: IssueAdapter? = null
-    private var adapterSpecial: IssueAdapter? = null
-
+    private var adapterUnified: IssueAdapter? = null
     private var jira: JiraClient? = null
-    private var itemsMain = mutableListOf<IssueItem>()
-    private var itemsSpecial = mutableListOf<IssueItem>()
+    private var itemsUnified = mutableListOf<IssueItem>()
 
     private val notifPerm = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {}
+
+    // === Animazione "pulsing" del tasto Save ===
+    private var savePulseAnimator: ValueAnimator? = null
+    private var baseSaveColor: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,24 +61,16 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         supportActionBar?.title = getString(R.string.app_name)
 
         statusText = findViewById(R.id.statusText)
-        recyclerMain = findViewById(R.id.recyclerMain)
-        recyclerSpecial = findViewById(R.id.recyclerSpecial)
-        specialTitle = findViewById(R.id.specialTitle)
+        recyclerUnified = findViewById(R.id.recyclerUnified)
         saveBtnToolbar = findViewById(R.id.saveBtnToolbar)
 
-        // Footer
         footerSaveBtn = findViewById(R.id.footerSaveBtn)
         footerSaveExitBtn = findViewById(R.id.footerSaveExitBtn)
         footerExitBtn = findViewById(R.id.footerExitBtn)
 
-        recyclerMain.layoutManager = LinearLayoutManager(this)
-        recyclerSpecial.layoutManager = LinearLayoutManager(this)
-
-        adapterMain = IssueAdapter(itemsMain) { onDirtyChanged() }
-        adapterSpecial = IssueAdapter(itemsSpecial) { onDirtyChanged() }
-
-        recyclerMain.adapter = adapterMain
-        recyclerSpecial.adapter = adapterSpecial
+        recyclerUnified.layoutManager = LinearLayoutManager(this)
+        adapterUnified = IssueAdapter(itemsUnified) { onDirtyChanged() }
+        recyclerUnified.adapter = adapterUnified
 
         saveBtnToolbar.setOnClickListener { saveChanges(false) }
         footerSaveBtn.setOnClickListener { saveChanges(false) }
@@ -84,20 +78,21 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         footerExitBtn.setOnClickListener { finish() }
 
         if (Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
         ) {
             notifPerm.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         val fromNotif = intent.getBooleanExtra("from_notification", false)
-        if (fromNotif) {
-            setStatus("🔔 Notificação recebida: carregando issues Jira…")
-        }
+        if (fromNotif) setStatus("🔔 Notificação recebida: carregando issues Jira…")
+
         loadData()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        stopPulsingSaveButtons()
         job.cancel()
     }
 
@@ -136,6 +131,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
         jira = JiraClient(prefs.baseUrl!!, prefs.email!!, prefs.token!!)
         val jql = prefs.jql
+        val enabledStatuses = prefs.getEnabledStatuses()
 
         launch {
             try {
@@ -143,7 +139,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 val specialList: MutableList<IssueItem>
 
                 withContext(Dispatchers.IO) {
-                    val finalMain = jira!!.fetchCurrentSprintIssues(jql)
+                    val finalMain = jira!!.fetchCurrentSprintIssues(jql, enabledStatuses)
                     val spec = jira!!.fetchSpecialSprintIssues()
 
                     mainList = finalMain.toMutableList()
@@ -151,36 +147,38 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     specialList = dedupSpecial.toMutableList()
                 }
 
-                // Card di test opzionale
                 val force = prefs.forceTestCard
                 val forcedKey = (prefs.testIssueKey ?: "FGC-9683").ifBlank { "FGC-9683" }
                 if (force) {
                     try {
-                        val alreadyKeys: Set<String> = (mainList + specialList).map { it.key }.toSet()
+                        val alreadyKeys: Set<String> =
+                            (mainList + specialList).map { it.key }.toSet()
                         if (!alreadyKeys.contains(forcedKey)) {
                             val forced = withContext(Dispatchers.IO) { jira!!.fetchIssueByKey(forcedKey) }
-                            if (forced != null) {
-                                mainList.add(0, forced)
-                            }
+                            if (forced != null) mainList.add(0, forced)
                         }
-                    } catch (_: Exception) { /* no-op */ }
+                    } catch (_: Exception) { }
                 }
 
-                itemsMain.clear(); itemsMain.addAll(mainList)
-                itemsSpecial.clear(); itemsSpecial.addAll(specialList)
-
-                adapterMain?.setData(ArrayList(itemsMain))
-
-                if (itemsSpecial.isNotEmpty()) {
-                    specialTitle.visibility = View.VISIBLE
-                    recyclerSpecial.visibility = View.VISIBLE
-                    adapterSpecial?.setData(ArrayList(itemsSpecial))
-                } else {
-                    specialTitle.visibility = View.GONE
-                    recyclerSpecial.visibility = View.GONE
+                // ✅ Combina le due liste in una sola, con separatore testuale
+                itemsUnified.clear()
+                itemsUnified.addAll(mainList)
+                if (specialList.isNotEmpty()) {
+                    // Aggiunge elemento-separatore fittizio
+                    itemsUnified.add(
+                        IssueItem(
+                            key = "---divider---",
+                            summary = getString(R.string.special_title),
+                            sp = 0.0,
+                            browseUrl = "",
+                            isSpecial = true
+                        )
+                    )
+                    itemsUnified.addAll(specialList)
                 }
 
-                setStatus("📊 ${itemsMain.size} cards (main) + ${itemsSpecial.size} special.")
+                adapterUnified?.setData(ArrayList(itemsUnified))
+                setStatus("📊 ${mainList.size} cards + ${specialList.size} especiais.")
             } catch (e: Exception) {
                 Log.e("point_down", "❌ Errore no loadData", e)
                 setStatus("❌ ${e.message}")
@@ -190,12 +188,17 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private fun saveChanges(exitAfter: Boolean) {
         val prefs = Prefs(this)
-        val toSave = (itemsMain + itemsSpecial).filter { it.dirty && it.newSp != it.sp }
+        val toSave = itemsUnified.filter {
+            it.key != "---divider---" && it.dirty && it.newSp != it.sp
+        }
         if (toSave.isEmpty()) {
             setStatus("Nada para salvar.")
+            // Non ci sono modifiche → stop pulsazione se stava andando
+            stopPulsingSaveButtons()
             if (exitAfter) finish()
             return
         }
+
         setStatus("💾 Salvando alterações…")
         launch {
             try {
@@ -205,7 +208,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         val userNew = issue.newSp
                         val lova = pts - userNew
 
-                        // Rilettura server + id
                         val (idNumFromSrv, pas) = jira!!.getCurrentSPAndId(issue.key)
                         if (issue.idNum == null && idNumFromSrv != null) issue.idNum = idNumFromSrv
 
@@ -217,7 +219,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         val np = if (pas == pts) clampHalfNonNeg(userNew)
                         else clampHalfNonNeg(pas - lova)
 
-                        // === Corridoio / Lock cooperativo (se abilitato) ===
                         var myLock: JSONObject? = null
                         if (prefs.enableQueueLock) {
                             myLock = try {
@@ -241,16 +242,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         }
                     }
                 }
-                adapterMain?.notifyDataSetChanged()
-                adapterSpecial?.notifyDataSetChanged()
+
+                adapterUnified?.notifyDataSetChanged()
                 setStatus("✅ ${toSave.size} issue(s) atualizadas.")
 
+                // Stop pulsazione e nascondi pulsante toolbar
+                stopPulsingSaveButtons()
                 saveBtnToolbar.visibility = View.GONE
-                if (exitAfter) {
-                    finish()
-                } else {
-                    loadData()
-                }
+
+                if (exitAfter) finish() else loadData()
             } catch (e: Exception) {
                 Log.e("point_down", "❌ Errore no saveChanges", e)
                 setStatus("❌ Erro ao salvar: ${e.message}")
@@ -259,6 +259,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun onDirtyChanged() {
+        // Mostra e fai un fade-in al primo sporco
         if (saveBtnToolbar.visibility != View.VISIBLE) {
             saveBtnToolbar.visibility = View.VISIBLE
             val fadeIn = AlphaAnimation(0f, 1f).apply {
@@ -267,5 +268,62 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             }
             saveBtnToolbar.startAnimation(fadeIn)
         }
+        // Avvia/continua la pulsazione del bottone Save
+        startPulsingSaveButtons()
+    }
+
+    // ================================
+    // Pulsazione colore tasto "Save"
+    // ================================
+    private fun resolveBaseButtonColor(): Int {
+        // 1) prova a usare il tint attuale del bottone toolbar (se presente)
+        val tint = saveBtnToolbar.backgroundTintList?.defaultColor
+        if (tint != null) return tint
+
+        // 2) risolvi colorPrimary dal tema
+        val tv = TypedValue()
+        val hasColor = theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, tv, true)
+        if (hasColor) {
+            return if (tv.resourceId != 0) ContextCompat.getColor(this, tv.resourceId) else tv.data
+        }
+
+        // 3) fallback: un blu "material-like"
+        return 0xFF2196F3.toInt()
+    }
+
+    private fun setSaveButtonsTint(color: Int) {
+        val csl = ColorStateList.valueOf(color)
+        saveBtnToolbar.backgroundTintList = csl
+        // anche il bottone Save nel footer pulsa
+        footerSaveBtn.backgroundTintList = csl
+    }
+
+    private fun startPulsingSaveButtons() {
+        if (savePulseAnimator?.isRunning == true) return
+
+        if (baseSaveColor == null) {
+            baseSaveColor = resolveBaseButtonColor()
+        }
+        val start = baseSaveColor!!
+        val lightGreen = 0xFF81C784.toInt() // verde chiaro
+
+        // Durata 300ms per semionda, REVERSE per ottenere avanti/indietro → ~600ms ciclo completo
+        savePulseAnimator = ValueAnimator.ofObject(ArgbEvaluator(), start, lightGreen).apply {
+            duration = 300L
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { animator ->
+                val c = animator.animatedValue as Int
+                setSaveButtonsTint(c)
+            }
+            start()
+        }
+    }
+
+    private fun stopPulsingSaveButtons() {
+        savePulseAnimator?.cancel()
+        savePulseAnimator = null
+        // ripristina il colore base
+        baseSaveColor?.let { setSaveButtonsTint(it) }
     }
 }

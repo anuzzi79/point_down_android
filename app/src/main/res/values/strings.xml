@@ -37,4 +37,13 @@
 
     <!-- ✅ Descrizione icona info token -->
     <string name="token_info_desc">Como obter o API Token</string>
+
+    <!-- ✅ NUOVO: Filtri Status -->
+    <string name="settings_status_filters_title">Filtros de Status (lista principal)</string>
+    <string name="settings_status_filters_hint">As seleções acima sempre se somam ao seu JQL. Se nenhum status for selecionado, nenhuma card será retornada.</string>
+    <string name="st_todo">To Do</string>
+    <string name="st_inprogress">In Progress</string>
+    <string name="st_blocked">Blocked</string>
+    <string name="st_needreqs">Need Reqs</string>
+    <string name="st_done">Done</string>
 </resources>

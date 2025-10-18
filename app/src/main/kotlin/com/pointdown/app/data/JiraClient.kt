@@ -19,7 +19,6 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
 
     companion object {
         private const val SP_FIELD_ID = "customfield_10022" // Story Points (ID fisso come da estensione)
-        private val STATUSES = listOf("In Progress", "Blocked", "Need Reqs", "Done")
 
         // === Lock cooperativo (stessa semantica del Chrome extension) ===
         const val PD_LOCK_KEY = "point_down_lock"
@@ -45,8 +44,15 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
         )
     }
 
-    private fun jqlWithStatuses(base: String?): String {
-        val clause = "status IN (${STATUSES.joinToString(",") { "\"$it\"" }})"
+    /** Costruisce la clausola status dinamica dai filtri selezionati. */
+    private fun buildStatusClause(statuses: List<String>): String {
+        if (statuses.isEmpty()) return "(status IS EMPTY)" // comport. identico all'estensione: nessun risultato
+        val quoted = statuses.joinToString(",") { "\"${it.replace("\"", "\\\"")}\"" }
+        return "status IN ($quoted)"
+    }
+
+    private fun jqlWithStatuses(base: String?, statuses: List<String>): String {
+        val clause = buildStatusClause(statuses)
         val trimmed = base?.trim().orEmpty()
         return if (trimmed.isEmpty()) clause else "($trimmed) AND $clause"
     }
@@ -58,7 +64,8 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
         do {
             val bodyJson = JSONObject().apply {
                 put("jql", finalJql)
-                put("fields", JSONArray(listOf("summary", SP_FIELD_ID)))
+                // ✅ includiamo anche "status" per avere status.name
+                put("fields", JSONArray(listOf("summary", SP_FIELD_ID, "status")))
                 put("maxResults", 100)
                 if (nextPageToken != null) put("nextPageToken", nextPageToken)
             }
@@ -84,6 +91,7 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
                     val fields = obj.optJSONObject("fields") ?: JSONObject()
                     val summary = fields.optString("summary", "(sem resumo)")
                     val sp = fields.optDouble(SP_FIELD_ID, 0.0)
+                    val statusName = fields.optJSONObject("status")?.optString("name")
 
                     all.add(
                         IssueItem(
@@ -95,7 +103,8 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
                             dirty = false,
                             isSpecial = false,
                             pts = sp, // baseline “fotografata” al fetch
-                            idNum = idNum
+                            idNum = idNum,
+                            statusName = statusName
                         )
                     )
                 }
@@ -118,19 +127,24 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
         client.newCall(req).execute().use { it.isSuccessful }
     }
 
-    suspend fun fetchCurrentSprintIssues(userJql: String?): List<IssueItem> {
+    /** ✅ Lista principale: rispetta i filtri di status selezionati. */
+    suspend fun fetchCurrentSprintIssues(userJql: String?, statuses: List<String>): List<IssueItem> {
         val base = if (!userJql.isNullOrBlank()) userJql.trim()
-        else "sprint in openSprints() AND assignee = currentUser() AND statusCategory != Done"
+        else "sprint in openSprints() AND assignee = currentUser()"
 
-        val finalJql = jqlWithStatuses(base)
+        val finalJql = jqlWithStatuses(base, statuses)
         return fetchIssuesByJql(finalJql)
     }
 
+    /**
+     * ✅ Lista "Special": come nell'estensione, IGNORA i filtri di status utente.
+     * Cerca in summary e description varianti di "explor*" e "regres*"
+     * su tutte le issue della sprint aperta (non solo le mie).
+     */
     suspend fun fetchSpecialSprintIssues(): List<IssueItem> {
         val specialBase =
-            """sprint in openSprints() AND (summary ~ "explorat" OR summary ~ "regres" OR summary ~ "regress")"""
-        val finalJql = jqlWithStatuses(specialBase)
-        return fetchIssuesByJql(finalJql).map { it.copy(isSpecial = true) }
+            """sprint in openSprints() AND (summary ~ "explor" OR summary ~ "explorat*" OR summary ~ "regres" OR summary ~ "regress" OR description ~ "explor*" OR description ~ "regres*")"""
+        return fetchIssuesByJql(specialBase).map { it.copy(isSpecial = true) }
     }
 
     /** ✅ Lettura puntuale del valore Story Points corrente + id numerico. */
@@ -157,7 +171,8 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
     /** ✅ Fetch diretto per una issue (usata per la “card di test”). */
     suspend fun fetchIssueByKey(issueKey: String): IssueItem? = withContext(Dispatchers.IO) {
         val req = Request.Builder()
-            .url("$baseUrl/rest/api/3/issue/$issueKey?fields=${"summary,$SP_FIELD_ID"}")
+            // includiamo anche status
+            .url("$baseUrl/rest/api/3/issue/$issueKey?fields=${"summary,$SP_FIELD_ID,status"}")
             .get()
             .headers(headers())
             .build()
@@ -170,6 +185,7 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
             val fields = data.optJSONObject("fields") ?: JSONObject()
             val summary = fields.optString("summary", "(sem resumo)")
             val sp = fields.optDouble(SP_FIELD_ID, 0.0)
+            val statusName = fields.optJSONObject("status")?.optString("name")
             return@use IssueItem(
                 key = key,
                 summary = summary,
@@ -179,7 +195,8 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
                 dirty = false,
                 isSpecial = false,
                 pts = sp,
-                idNum = idNum
+                idNum = idNum,
+                statusName = statusName
             )
         }
     }
@@ -293,14 +310,6 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
             }
         }
 
-    /**
-     * Tenta acquisire lock cooperativo su una issue:
-     * 1) CAS create (hasProperty=false)
-     * 2) se esiste ed è scaduto → takeover (hasProperty=true + currentValue)
-     * 3) altrimenti attende con backoff fino a timeout
-     *
-     * @return l'oggetto JSON del *mio* lock (da usare in release) oppure null se disabilitato a livello app
-     */
     suspend fun acquireLockOrWait(issueKey: String, idNum: Long?): JSONObject {
         require(idNum != null && idNum > 0) { "Issue ID numerico necessario per il lock ($issueKey)" }
 

@@ -40,6 +40,13 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         val queueLockCheck = findViewById<CheckBox>(R.id.enableQueueLockCheck)
         val weekendCheck = findViewById<CheckBox>(R.id.enableWeekendCheck)
 
+        // ✅ NUOVO: Checkboxes filtri status
+        val stToDo = findViewById<CheckBox>(R.id.st_todo)
+        val stInProgress = findViewById<CheckBox>(R.id.st_inprogress)
+        val stBlocked = findViewById<CheckBox>(R.id.st_blocked)
+        val stNeedReqs = findViewById<CheckBox>(R.id.st_needreqs)
+        val stDone = findViewById<CheckBox>(R.id.st_done)
+
         val testBtn = findViewById<Button>(R.id.testBtn)
         val saveBtn = findViewById<Button>(R.id.saveBtn)
         val infoBtn = findViewById<ImageButton>(R.id.infoTokenBtn)
@@ -80,10 +87,23 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
                     if (testIssueKeyEdit.text.isNullOrBlank()) {
                         testIssueKeyEdit.setText(prefs.testIssueKey ?: "FGC-9683")
                     }
+                    // Inizializza i filtri status con i valori salvati (o default)
+                    stToDo.isChecked = prefs.stToDo
+                    stInProgress.isChecked = prefs.stInProgress
+                    stBlocked.isChecked = prefs.stBlocked
+                    stNeedReqs.isChecked = prefs.stNeedReqs
+                    stDone.isChecked = prefs.stDone
                     advancedInitialized = true
                 }
             }
         }
+
+        // Sezione Avançadas inizialmente chiusa ma i checkbox devono rispecchiare i valori anche senza apertura
+        stToDo.isChecked = prefs.stToDo
+        stInProgress.isChecked = prefs.stInProgress
+        stBlocked.isChecked = prefs.stBlocked
+        stNeedReqs.isChecked = prefs.stNeedReqs
+        stDone.isChecked = prefs.stDone
 
         // Test connessione
         testBtn.setOnClickListener {
@@ -131,6 +151,13 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             p.testIssueKey = (testIssueKeyEdit.text?.toString()?.trim().takeUnless { it.isNullOrBlank() } ?: "FGC-9683")
             p.enableQueueLock = queueLockCheck.isChecked
             p.enableWeekendNotifications = weekendCheck.isChecked
+
+            // ✅ Salva filtri status
+            p.stToDo = stToDo.isChecked
+            p.stInProgress = stInProgress.isChecked
+            p.stBlocked = stBlocked.isChecked
+            p.stNeedReqs = stNeedReqs.isChecked
+            p.stDone = stDone.isChecked
 
             p.alarmTime = "%02d:%02d".format(h, m)
 

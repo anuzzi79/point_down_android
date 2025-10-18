@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Titolo di sezione "Special" come semplice banda testuale,
+  non interattiva e con sfondo trasparente.
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dividerTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:textStyle="bold"
+    android:textColor="#FFA000"
+    android:textSize="16sp"
+    android:background="@android:color/transparent" />

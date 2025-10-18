@@ -13,7 +13,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.PointDown.DarkPopup">
 
-        <!-- (opzionale) pulsante Save in toolbar: può restare, ma il footer è quello “principale” -->
         <Button
             android:id="@+id/saveBtnToolbar"
             android:layout_width="wrap_content"
@@ -23,12 +22,12 @@
             android:alpha="0"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Contenuti scrollabili: status + liste -->
+    <!-- Contenuto scrollabile unico -->
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/statusText"
@@ -40,32 +39,14 @@
             android:background="#333333"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
-            android:id="@+id/specialTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Special Issues"
-            android:visibility="gone"
-            android:padding="8dp"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_orange_light" />
-
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerMain"
+            android:id="@+id/recyclerUnified"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:background="#222222" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerSpecial"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:background="#1A1A1A" />
     </LinearLayout>
 
-    <!-- Footer “freezato” con i 3 pulsanti -->
+    <!-- Footer “freezato” -->
     <LinearLayout
         android:id="@+id/footerBar"
         android:layout_width="match_parent"
@@ -99,5 +80,4 @@
             android:layout_weight="1"
             android:text="Exit"/>
     </LinearLayout>
-
 </LinearLayout>

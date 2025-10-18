@@ -44,6 +44,41 @@ class Prefs(ctx: Context) {
         get() = sp.getBoolean("enableWeekendNotifications", false)
         set(v) = sp.edit().putBoolean("enableWeekendNotifications", v).apply()
 
+    // ============================================
+    // ✅ NUOVO: Filtri di Status configurabili (parità con estensione)
+    // Default: To Do=false, In Progress=true, Blocked=true, Need Reqs=true, Done=false
+    // ============================================
+    var stToDo: Boolean
+        get() = sp.getBoolean("stToDo", false)
+        set(v) = sp.edit().putBoolean("stToDo", v).apply()
+
+    var stInProgress: Boolean
+        get() = sp.getBoolean("stInProgress", true)
+        set(v) = sp.edit().putBoolean("stInProgress", v).apply()
+
+    var stBlocked: Boolean
+        get() = sp.getBoolean("stBlocked", true)
+        set(v) = sp.edit().putBoolean("stBlocked", v).apply()
+
+    var stNeedReqs: Boolean
+        get() = sp.getBoolean("stNeedReqs", true)
+        set(v) = sp.edit().putBoolean("stNeedReqs", v).apply()
+
+    var stDone: Boolean
+        get() = sp.getBoolean("stDone", false)
+        set(v) = sp.edit().putBoolean("stDone", v).apply()
+
+    /** Restituisce la lista di status abilitati. Se nessuno selezionato, ritorna lista vuota → nessun card. */
+    fun getEnabledStatuses(): List<String> {
+        val list = mutableListOf<String>()
+        if (stToDo) list.add("To Do")
+        if (stInProgress) list.add("In Progress")
+        if (stBlocked) list.add("Blocked")
+        if (stNeedReqs) list.add("Need Reqs")
+        if (stDone) list.add("Done")
+        return list
+    }
+
     fun getHourMinute(): Pair<Int, Int> {
         val t = alarmTime ?: "17:50"
         val m = Regex("(\\d{1,2}):(\\d{2})").find(t)

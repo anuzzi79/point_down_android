@@ -105,6 +105,80 @@
             android:paddingTop="16dp"
             android:visibility="gone">
 
+            <!-- ✅ NUOVO: Filtri di Status (match estensione) -->
+            <TextView
+                android:id="@+id/statusFiltersLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_status_filters_title"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:paddingBottom="6dp"/>
+
+            <LinearLayout
+                android:id="@+id/statusFiltersRow1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/st_todo"
+                    android:text="@string/st_todo"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <CheckBox
+                    android:id="@+id/st_inprogress"
+                    android:text="@string/st_inprogress"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/statusFiltersRow2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/st_blocked"
+                    android:text="@string/st_blocked"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <CheckBox
+                    android:id="@+id/st_needreqs"
+                    android:text="@string/st_needreqs"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/st_done"
+                android:text="@string/st_done"
+                android:textColor="#FFFFFF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"/>
+
+            <TextView
+                android:id="@+id/statusFiltersHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_status_filters_hint"
+                android:textColor="#9AA0A6"
+                android:textSize="12sp"
+                android:paddingTop="2dp"
+                android:paddingBottom="8dp"/>
+
             <CheckBox
                 android:id="@+id/forceTestCardCheck"
                 android:text="@string/settings_force_test_card_title"
