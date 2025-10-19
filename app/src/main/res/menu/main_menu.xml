@@ -2,18 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Mostrato come icona nella Toolbar, a sinistra dei tre puntini -->
+    <!-- Rimane il refresh come icona -->
     <item
         android:id="@+id/action_refresh"
         android:title="Recarregar"
         android:icon="@drawable/refresh"
         app:showAsAction="always" />
 
-    <!-- Restano nel menu overflow -->
+    <!-- NUOVO: ingranaggio (opcoes.png) visibile in toolbar -->
     <item
-        android:id="@+id/action_save"
-        android:title="Save" />
-    <item
-        android:id="@+id/action_settings"
-        android:title="Settings" />
+        android:id="@+id/action_settings_gear"
+        android:title="Settings"
+        android:icon="@drawable/opcoes"
+        app:showAsAction="always" />
 </menu>

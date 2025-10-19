@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">point_down</string>
     <string name="status_loading">Carregando issues da sprint atual…</string>
-    <string name="special_title">Você pode estar precisando baixar também pontos destas cards</string>
+    <string name="special_title">Cards em que você está provavelmente envolvido por tratarem de Exploratório ou Regression</string>
     <string name="open_in_browser">Abrir</string>
     <string name="notif_title">Precisa baixar o ponto</string>
     <string name="notif_text">Toque para abrir o point_down e ajustar os Story Points.</string>
@@ -46,4 +46,8 @@
     <string name="st_blocked">Blocked</string>
     <string name="st_needreqs">Need Reqs</string>
     <string name="st_done">Done</string>
+
+    <!-- ✅ Toggle testo per show/hide zerados -->
+    <string name="show_zeros">Mostra os cards zerados</string>
+    <string name="hide_zeros">Oculta os cards zerados</string>
 </resources>
