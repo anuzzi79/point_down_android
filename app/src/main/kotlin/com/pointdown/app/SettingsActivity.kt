@@ -2,21 +2,20 @@ package com.pointdown.app
 
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.pointdown.app.alarm.AlarmScheduler
-import com.pointdown.app.data.JiraClient
 import com.pointdown.app.data.Prefs
 import kotlinx.coroutines.*
-
 import android.content.Intent
 import android.net.Uri
-import android.view.View
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 
 class SettingsActivity : AppCompatActivity(), CoroutineScope {
     private val job = SupervisorJob()
     override val coroutineContext = Dispatchers.Main + job
-
     override fun onDestroy() { super.onDestroy(); job.cancel() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,140 +28,256 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         val email = findViewById<EditText>(R.id.emailEdit)
         val token = findViewById<EditText>(R.id.tokenEdit)
         val jql = findViewById<EditText>(R.id.jqlEdit)
-
         val timePicker = findViewById<TimePicker>(R.id.timePicker)
-        val status = findViewById<TextView>(R.id.statusTextSettings)
-
         val advancedBtn = findViewById<Button>(R.id.advancedBtn)
         val advancedSection = findViewById<LinearLayout>(R.id.advancedSection)
-        val testCardCheck = findViewById<CheckBox>(R.id.forceTestCardCheck)
-        val testIssueKeyEdit = findViewById<EditText>(R.id.testIssueKeyEdit)
-        val queueLockCheck = findViewById<CheckBox>(R.id.enableQueueLockCheck)
-        val weekendCheck = findViewById<CheckBox>(R.id.enableWeekendCheck)
+        val saveBtn = findViewById<Button>(R.id.saveBtn)
+        val testBtn = findViewById<Button>(R.id.testBtn)
+        
+        val qaCheck = findViewById<CheckBox>(R.id.qaCheck)
+        val devCheck = findViewById<CheckBox>(R.id.devCheck)
+        val squadModeBlock = findViewById<LinearLayout>(R.id.squadModeBlock)
+        val squadModeCheck = findViewById<CheckBox>(R.id.squadModeCheck)
+        val squadKeywordsEdit = findViewById<EditText>(R.id.squadKeywordsEdit)
+        val addKeywordBtn = findViewById<ImageButton>(R.id.addKeywordBtn)
+        val keywordsChipGroup = findViewById<ChipGroup>(R.id.keywordsChipGroup)
+        val squadEpicInput = findViewById<EditText>(R.id.squadEpicInput)
+        val addSquadEpicBtn = findViewById<ImageButton>(R.id.addSquadEpicBtn)
+        val squadEpicChipGroup = findViewById<ChipGroup>(R.id.squadEpicChipGroup)
 
-        // ✅ NUOVO: Checkboxes filtri status
-        val stToDo = findViewById<CheckBox>(R.id.st_todo)
+        // Advanced toggles and status filters
+        val forceTestCardCheck = findViewById<CheckBox>(R.id.forceTestCardCheck)
+        val enableQueueLockCheck = findViewById<CheckBox>(R.id.enableQueueLockCheck)
+        val enableWeekendCheck = findViewById<CheckBox>(R.id.enableWeekendCheck)
+        val stTodo = findViewById<CheckBox>(R.id.st_todo)
         val stInProgress = findViewById<CheckBox>(R.id.st_inprogress)
         val stBlocked = findViewById<CheckBox>(R.id.st_blocked)
         val stNeedReqs = findViewById<CheckBox>(R.id.st_needreqs)
         val stDone = findViewById<CheckBox>(R.id.st_done)
+        val stCodeReview = findViewById<CheckBox>(R.id.st_codereview)
+        val stTesting = findViewById<CheckBox>(R.id.st_testing)
+        val stQA = findViewById<CheckBox>(R.id.st_qa)
 
-        val testBtn = findViewById<Button>(R.id.testBtn)
-        val saveBtn = findViewById<Button>(R.id.saveBtn)
-        val infoBtn = findViewById<ImageButton>(R.id.infoTokenBtn)
+        // Set initial states
+        qaCheck.isChecked = prefs.profileType == "QA"
+        devCheck.isChecked = prefs.profileType == "DEV"
+        squadModeCheck.isChecked = prefs.enableSquadMode
+        squadModeBlock.visibility = if (prefs.profileType == "DEV") View.VISIBLE else View.GONE
 
-        // Campi base
+        // Comportamento mutuamente esclusivo QA/DEV
+        qaCheck.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                devCheck.isChecked = false
+                prefs.profileType = "QA"
+                squadModeBlock.visibility = View.GONE
+            }
+        }
+        
+        devCheck.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                qaCheck.isChecked = false
+                prefs.profileType = "DEV"
+                squadModeBlock.visibility = View.VISIBLE
+            } else {
+                squadModeBlock.visibility = View.GONE
+            }
+        }
+
+        // Squad Mode
+        squadModeCheck.setOnCheckedChangeListener { _, checked ->
+            prefs.enableSquadMode = checked
+            squadKeywordsEdit.visibility = if (checked) View.VISIBLE else View.GONE
+            keywordsChipGroup.visibility = if (checked) View.VISIBLE else View.GONE
+        }
+        
+        squadKeywordsEdit.visibility = if (prefs.enableSquadMode) View.VISIBLE else View.GONE
+        keywordsChipGroup.visibility = if (prefs.enableSquadMode) View.VISIBLE else View.GONE
+
+        // Load existing keywords
+        fun renderChips(words: List<String>) {
+            keywordsChipGroup.removeAllViews()
+            words.forEach { w ->
+                val chip = Chip(this).apply {
+                    text = w
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        val updated = Prefs(this@SettingsActivity).getSquadKeywords().filter { it != w }
+                        Prefs(this@SettingsActivity).setSquadKeywords(updated)
+                        renderChips(updated)
+                    }
+                }
+                keywordsChipGroup.addView(chip)
+            }
+        }
+
+        renderChips(Prefs(this).getSquadKeywords())
+
+        fun addKeywordFromInput() {
+            val raw = squadKeywordsEdit.text.toString().trim()
+            if (raw.isEmpty()) return
+            val list = Prefs(this).getSquadKeywords().toMutableList()
+            if (!list.contains(raw)) {
+                list.add(raw)
+                Prefs(this).setSquadKeywords(list)
+                renderChips(list)
+            }
+            squadKeywordsEdit.setText("")
+        }
+
+        addKeywordBtn.setOnClickListener { addKeywordFromInput() }
+        squadKeywordsEdit.setOnEditorActionListener { _, _, _ -> addKeywordFromInput(); true }
+
+        // === Campi esistenti ===
         baseUrl.setText(prefs.baseUrl)
         email.setText(prefs.email)
         token.setText(prefs.token)
         jql.setText(prefs.jql)
 
-        // Ora (24h) – blocco subito sotto JQL
         val (h0, m0) = prefs.getHourMinute()
         timePicker.setIs24HourView(true)
-        if (Build.VERSION.SDK_INT >= 23) {
-            timePicker.hour = h0; timePicker.minute = m0
-        } else {
-            timePicker.currentHour = h0; timePicker.currentMinute = m0
-        }
+        if (Build.VERSION.SDK_INT >= 23) { timePicker.hour = h0; timePicker.minute = m0 }
+        else { timePicker.currentHour = h0; timePicker.currentMinute = m0 }
 
-        // 🔗 Aiuto: apre il video YouTube con le istruzioni del token
-        infoBtn.setOnClickListener {
+        findViewById<ImageButton>(R.id.infoTokenBtn).setOnClickListener {
             val url = "https://youtu.be/X1F5LfCuq6I"
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
 
-        // Bottone "Avançadas": toggle mostra/nascondi.
-        // Alla PRIMA apertura imposta tutte le opzioni su ON e precompila la issue key di test.
-        var advancedInitialized = false
-        advancedBtn.setOnClickListener {
-            if (advancedSection.visibility == View.VISIBLE) {
-                advancedSection.visibility = View.GONE
-            } else {
-                advancedSection.visibility = View.VISIBLE
-                if (!advancedInitialized) {
-                    testCardCheck.isChecked = true
-                    queueLockCheck.isChecked = true
-                    weekendCheck.isChecked = true
-                    if (testIssueKeyEdit.text.isNullOrBlank()) {
-                        testIssueKeyEdit.setText(prefs.testIssueKey ?: "FGC-9683")
-                    }
-                    // Inizializza i filtri status con i valori salvati (o default)
-                    stToDo.isChecked = prefs.stToDo
-                    stInProgress.isChecked = prefs.stInProgress
-                    stBlocked.isChecked = prefs.stBlocked
-                    stNeedReqs.isChecked = prefs.stNeedReqs
-                    stDone.isChecked = prefs.stDone
-                    advancedInitialized = true
-                }
-            }
-        }
+        // === Advanced defaults ===
+        forceTestCardCheck.isChecked = prefs.forceTestCard
+        enableQueueLockCheck.isChecked = prefs.enableQueueLock
+        enableWeekendCheck.isChecked = prefs.enableWeekendNotifications
 
-        // Sezione Avançadas inizialmente chiusa ma i checkbox devono rispecchiare i valori anche senza apertura
-        stToDo.isChecked = prefs.stToDo
+        stTodo.isChecked = prefs.stToDo
         stInProgress.isChecked = prefs.stInProgress
         stBlocked.isChecked = prefs.stBlocked
         stNeedReqs.isChecked = prefs.stNeedReqs
         stDone.isChecked = prefs.stDone
+        stCodeReview.isChecked = prefs.stCodeReview
+        stTesting.isChecked = prefs.stTesting
+        stQA.isChecked = prefs.stQA
+
+        fun renderCodeChips(codes: List<String>) {
+            val grp = findViewById<ChipGroup>(R.id.searchCodesChipGroup)
+            grp.removeAllViews()
+            codes.forEach { num ->
+                val chip = Chip(this).apply {
+                    text = "FGC-$num"
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        val updated = Prefs(this@SettingsActivity).getSearchCodes().filter { it != num }
+                        Prefs(this@SettingsActivity).setSearchCodes(updated)
+                        renderCodeChips(updated)
+                    }
+                }
+                grp.addView(chip)
+            }
+        }
+
+        fun renderEpicChips(codes: List<String>) {
+            squadEpicChipGroup.removeAllViews()
+            codes.forEach { num ->
+                val chip = Chip(this).apply {
+                    text = "FGC-$num"
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        val updated = Prefs(this@SettingsActivity).getSquadEpics().filter { it != num }
+                        Prefs(this@SettingsActivity).setSquadEpics(updated)
+                        renderEpicChips(updated)
+                    }
+                }
+                squadEpicChipGroup.addView(chip)
+            }
+        }
+
+        renderCodeChips(Prefs(this).getSearchCodes())
+        renderEpicChips(Prefs(this).getSquadEpics())
+
+        findViewById<ImageButton>(R.id.addSearchCodeBtn).setOnClickListener {
+            val raw = findViewById<EditText>(R.id.searchCodeInput).text.toString().trim()
+            val onlyDigits = raw.replace("\\D+".toRegex(), "")
+            if (onlyDigits.isEmpty()) return@setOnClickListener
+            val list = Prefs(this).getSearchCodes().toMutableList()
+            if (!list.contains(onlyDigits)) {
+                list.add(onlyDigits)
+                Prefs(this).setSearchCodes(list)
+                renderCodeChips(list)
+            }
+            findViewById<EditText>(R.id.searchCodeInput).setText("")
+        }
+
+        addSquadEpicBtn.setOnClickListener {
+            val raw = squadEpicInput.text.toString().trim()
+            val onlyDigits = raw.replace("\\D+".toRegex(), "")
+            if (onlyDigits.isEmpty()) return@setOnClickListener
+            val list = Prefs(this).getSquadEpics().toMutableList()
+            if (!list.contains(onlyDigits)) {
+                list.add(onlyDigits)
+                Prefs(this).setSquadEpics(list)
+                renderEpicChips(list)
+            }
+            squadEpicInput.setText("")
+        }
 
         // Test connessione
         testBtn.setOnClickListener {
-            status.text = getString(R.string.settings_testing)
             val bu = baseUrl.text.toString().trim()
             val em = email.text.toString().trim()
             val tk = token.text.toString().trim()
             if (bu.isEmpty() || em.isEmpty() || tk.isEmpty()) {
-                status.text = getString(R.string.settings_fill_required)
+                testBtn.text = getString(R.string.settings_fill_required)
                 return@setOnClickListener
             }
+            testBtn.text = getString(R.string.settings_testing)
             launch {
                 try {
-                    val ok = withContext(Dispatchers.IO) { JiraClient(bu, em, tk).testAuth() }
-                    status.text = if (ok) getString(R.string.settings_conn_ok) else getString(R.string.settings_auth_fail)
+                    val ok = withContext(Dispatchers.IO) {
+                        com.pointdown.app.data.JiraClient(bu, em, tk).testAuth()
+                    }
+                    testBtn.text = if (ok) getString(R.string.settings_conn_ok)
+                    else getString(R.string.settings_auth_fail)
                 } catch (e: Exception) {
-                    status.text = "❌ Erro: ${e.message}"
+                    testBtn.text = "❌ Erro: ${e.message}"
                 }
             }
         }
 
         // Salvataggio
         saveBtn.setOnClickListener {
-            val bu = baseUrl.text.toString().trim()
-            val em = email.text.toString().trim()
-            val tk = token.text.toString().trim()
-            val jq = jql.text.toString().trim()
-
-            if (bu.isEmpty() || em.isEmpty() || tk.isEmpty()) {
-                status.text = getString(R.string.settings_required_missing)
-                return@setOnClickListener
-            }
+            val p = Prefs(this)
+            p.baseUrl = baseUrl.text.toString().trim()
+            p.email = email.text.toString().trim()
+            p.token = token.text.toString().trim()
+            p.jql = jql.text.toString().trim()
 
             val h = if (Build.VERSION.SDK_INT >= 23) timePicker.hour else timePicker.currentHour
             val m = if (Build.VERSION.SDK_INT >= 23) timePicker.minute else timePicker.currentMinute
 
-            val p = Prefs(this)
-            p.baseUrl = bu
-            p.email = em
-            p.token = tk
-            p.jql = jq
+            p.profileType = if (devCheck.isChecked) "DEV" else "QA"
+            p.enableSquadMode = squadModeCheck.isChecked
+            p.forceTestCard = forceTestCardCheck.isChecked
+            p.enableQueueLock = enableQueueLockCheck.isChecked
+            p.enableWeekendNotifications = enableWeekendCheck.isChecked
 
-            // Opzioni avanzate
-            p.forceTestCard = testCardCheck.isChecked
-            p.testIssueKey = (testIssueKeyEdit.text?.toString()?.trim().takeUnless { it.isNullOrBlank() } ?: "FGC-9683")
-            p.enableQueueLock = queueLockCheck.isChecked
-            p.enableWeekendNotifications = weekendCheck.isChecked
-
-            // ✅ Salva filtri status
-            p.stToDo = stToDo.isChecked
+            // persist status
+            p.stToDo = stTodo.isChecked
             p.stInProgress = stInProgress.isChecked
             p.stBlocked = stBlocked.isChecked
             p.stNeedReqs = stNeedReqs.isChecked
             p.stDone = stDone.isChecked
+            p.stCodeReview = stCodeReview.isChecked
+            p.stTesting = stTesting.isChecked
+            p.stQA = stQA.isChecked
 
             p.alarmTime = "%02d:%02d".format(h, m)
+            AlarmScheduler.scheduleDaily(this, h, m, enableWeekendCheck.isChecked)
 
-            AlarmScheduler.scheduleDaily(this, h, m, p.enableWeekendNotifications)
-            status.text = getString(R.string.settings_saved_ok)
+            saveBtn.text = getString(R.string.settings_saved_ok)
+        }
+
+        advancedBtn.setOnClickListener {
+            advancedSection.visibility =
+                if (advancedSection.visibility == View.GONE) View.VISIBLE else View.GONE
         }
     }
 }

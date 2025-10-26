@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Layout con footer fisso:
-  - ScrollView con tutto il contenuto della pagina
-  - Footer con i 3 bottoni fissato in basso
-  - Barra di microfeedback (status) fissata sotto al footer
--->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- Contenuto scrollabile -->
     <ScrollView
         android:id="@+id/settingsScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/footerContainer"
-        android:background="#000000">
+        android:layout_above="@+id/footerContainer">
 
         <LinearLayout
             android:orientation="vertical"
@@ -45,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <!-- Riga orizzontale: campo API Token + pulsante info -->
+            <!-- API Token + info -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,10 +60,7 @@
                     android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="6dp"
-                    android:contentDescription="@string/token_info_desc"
                     android:src="@drawable/info_icon"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"
                     app:tint="@null"/>
             </LinearLayout>
 
@@ -84,13 +72,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <!-- BLOCCO ORA: testo a sinistra, timepicker a destra (subito sotto JQL) -->
+            <!-- ✅ BLOCCO PERFIL: label e due checkbox allineati -->
+            <LinearLayout
+                android:id="@+id/profileBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/profileLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Perfil:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:paddingEnd="12dp"/>
+
+                <CheckBox
+                    android:id="@+id/qaCheck"
+                    android:text="Sou QA"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="12dp"/>
+
+                <CheckBox
+                    android:id="@+id/devCheck"
+                    android:text="Sou DEV"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <!-- ✅ BLOCCO ORA -->
             <LinearLayout
                 android:id="@+id/timeBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="16dp">
+                android:paddingTop="8dp">
 
                 <TextView
                     android:id="@+id/timeLabel"
@@ -99,19 +122,111 @@
                     android:layout_weight="1"
                     android:text="@string/time_block_label"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp"
-                    android:lineSpacingExtra="2dp"/>
+                    android:textSize="16sp"/>
 
                 <TimePicker
                     android:id="@+id/timePicker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:timePickerMode="spinner"
-                    android:layout_marginStart="16dp"
                     android:theme="@style/PointDown.TimePickerText"/>
             </LinearLayout>
 
-            <!-- Sezione AVANZATE (toggle, nascosta di default) -->
+            <!-- ✅ BLOCCO SQUAD MODE (visibile solo se Sou DEV) -->
+            <LinearLayout
+                android:id="@+id/squadModeBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="12dp"
+                android:visibility="gone">
+
+                <CheckBox
+                    android:id="@+id/squadModeCheck"
+                    android:text="Ativar Squad Mode (DEV)"
+                    android:textColor="#FFFFFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <!-- Keyword input row: text + add button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="8dp">
+
+                    <EditText
+                        android:id="@+id/squadKeywordsEdit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Ex.: buffer, Support Dev"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#9AA0A6"/>
+
+                    <ImageButton
+                        android:id="@+id/addKeywordBtn"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Add keyword"
+                        android:src="@drawable/ic_add"
+                        android:tint="#FFFFFF"/>
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/keywordsChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    app:singleLine="false"
+                    app:singleSelection="false"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="8dp"/>
+
+                <!-- Squad Epics (FGC-<num>) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="8dp">
+
+                    <EditText
+                        android:id="@+id/squadEpicInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="FGC-1234 → digite só números (ex.: 1234)"
+                        android:inputType="number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#9AA0A6"/>
+
+                    <ImageButton
+                        android:id="@+id/addSquadEpicBtn"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Add epic"
+                        android:src="@drawable/ic_add"
+                        android:tint="#FFFFFF"/>
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/squadEpicChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    app:singleLine="false"
+                    app:singleSelection="false"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="8dp"/>
+            </LinearLayout>
+
+            <!-- Sezione avanzata rimane in basso -->
             <LinearLayout
                 android:id="@+id/advancedSection"
                 android:layout_width="match_parent"
@@ -120,160 +235,143 @@
                 android:paddingTop="16dp"
                 android:visibility="gone">
 
-                <!-- ✅ NUOVO: Filtri di Status (match estensione) -->
-                <TextView
-                    android:id="@+id/statusFiltersLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_status_filters_title"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:paddingBottom="6dp"/>
-
+                <!-- Status Filters Grid -->
                 <LinearLayout
-                    android:id="@+id/statusFiltersRow1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <CheckBox
-                        android:id="@+id/st_todo"
-                        android:text="@string/st_todo"
-                        android:textColor="#FFFFFF"
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
+                        android:text="Filtros de Status (lista principal)"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:paddingBottom="8dp"/>
 
-                    <CheckBox
-                        android:id="@+id/st_inprogress"
-                        android:text="@string/st_inprogress"
-                        android:textColor="#FFFFFF"
-                        android:layout_width="0dp"
+                    <GridLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
+                        android:columnCount="2"
+                        android:rowCount="4"
+                        android:columnOrderPreserved="false">
+
+                        <CheckBox android:id="@+id/st_todo" android:text="To Do" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_inprogress" android:text="In Progress" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_blocked" android:text="Blocked" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_needreqs" android:text="Need Reqs" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_done" android:text="Done" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_codereview" android:text="Code Review" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_testing" android:text="Testing" android:textColor="#FFFFFF"/>
+                        <CheckBox android:id="@+id/st_qa" android:text="QA" android:textColor="#FFFFFF"/>
+                    </GridLayout>
                 </LinearLayout>
 
+                <!-- Search Codes (FGC-<num>) -->
                 <LinearLayout
-                    android:id="@+id/statusFiltersRow2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:paddingTop="16dp">
 
-                    <CheckBox
-                        android:id="@+id/st_blocked"
-                        android:text="@string/st_blocked"
-                        android:textColor="#FFFFFF"
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
+                        android:text="Chama também os cards com código..."
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
 
-                    <CheckBox
-                        android:id="@+id/st_needreqs"
-                        android:text="@string/st_needreqs"
-                        android:textColor="#FFFFFF"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingTop="8dp">
+
+                        <EditText
+                            android:id="@+id/searchCodeInput"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:inputType="number"
+                            android:hint="FGC-1234 → digite só números (ex.: 1234)"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#9AA0A6"/>
+
+                        <ImageButton
+                            android:id="@+id/addSearchCodeBtn"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Add code"
+                            android:src="@drawable/ic_add"
+                            android:tint="#FFFFFF"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/searchCodesChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        app:singleLine="false"
+                        app:singleSelection="false"
+                        app:chipSpacingHorizontal="8dp"
+                        app:chipSpacingVertical="8dp"/>
                 </LinearLayout>
 
-                <CheckBox
-                    android:id="@+id/st_done"
-                    android:text="@string/st_done"
-                    android:textColor="#FFFFFF"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="4dp"/>
-
-                <TextView
-                    android:id="@+id/statusFiltersHint"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_status_filters_hint"
-                    android:textColor="#9AA0A6"
-                    android:textSize="12sp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="8dp"/>
-
+                <!-- Advanced Toggles -->
                 <CheckBox
                     android:id="@+id/forceTestCardCheck"
-                    android:text="@string/settings_force_test_card_title"
-                    android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:paddingTop="8dp"/>
-
-                <EditText
-                    android:id="@+id/testIssueKeyEdit"
-                    android:hint="@string/settings_test_issue_key_hint"
-                    android:inputType="text"
+                    android:text="Sim, quero que apareça a card de teste! (FGC-9683)"
                     android:textColor="#FFFFFF"
-                    android:textColorHint="#9AA0A6"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:enabled="true"/>
+                    android:paddingTop="16dp"/>
 
                 <CheckBox
                     android:id="@+id/enableQueueLockCheck"
-                    android:text="@string/settings_enable_queue_lock_title"
-                    android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
+                    android:text="Ativar fila/lock cooperativo (anti-concorrência) via Issue Property"
+                    android:textColor="#FFFFFF"
                     android:paddingTop="8dp"/>
 
                 <CheckBox
                     android:id="@+id/enableWeekendCheck"
-                    android:text="@string/settings_enable_weekend_title"
-                    android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
+                    android:text="Ativar notificações também sábado e domingo (test)"
+                    android:textColor="#FFFFFF"
                     android:paddingTop="8dp"/>
+
             </LinearLayout>
 
-            <!-- Spazio finale per non tagliare l'ultimo elemento quando si arriva in fondo -->
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24dp"/>
+                android:layout_height="48dp"/>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Footer fisso con i tre bottoni: sfondo TRASPARENTE
-         (si deve vedere il nero del banner sotto) -->
+    <!-- Footer -->
     <LinearLayout
         android:id="@+id/footerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/feedbackBar"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="12dp"
         android:gravity="center"
         android:background="@android:color/transparent"
         android:elevation="8dp">
 
-        <!-- Bottoni con stile Material3 di sistema (riempiti, viola/rosa)
-             Nessun background personalizzato qui -->
         <Button
             android:id="@+id/advancedBtn"
             android:text="@string/advanced_btn"
             android:textColor="#FFFFFF"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.3"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="none"
-            android:hyphenationFrequency="none"
-            android:breakStrategy="balanced"
-            android:includeFontPadding="false"
-            android:minHeight="48dp"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="18dp"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeMaxTextSize="16sp"
-            app:autoSizeStepGranularity="1sp"/>
+            android:layout_weight="1"/>
 
         <Button
             android:id="@+id/testBtn"
@@ -281,21 +379,8 @@
             android:textColor="#FFFFFF"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1.3"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="none"
-            android:hyphenationFrequency="none"
-            android:breakStrategy="balanced"
-            android:includeFontPadding="false"
-            android:minHeight="48dp"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="18dp"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeMaxTextSize="16sp"
-            app:autoSizeStepGranularity="1sp"/>
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"/>
 
         <Button
             android:id="@+id/saveBtn"
@@ -303,40 +388,7 @@
             android:textColor="#FFFFFF"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="0.9"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="none"
-            android:hyphenationFrequency="none"
-            android:breakStrategy="balanced"
-            android:includeFontPadding="false"
-            android:minHeight="48dp"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="18dp"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeMaxTextSize="16sp"
-            app:autoSizeStepGranularity="1sp"/>
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"/>
     </LinearLayout>
-
-    <!-- Microfeedback fisso, subito sotto al footer -->
-    <LinearLayout
-        android:id="@+id/feedbackBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#101010"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp"
-        android:elevation="6dp">
-
-        <TextView
-            android:id="@+id/statusTextSettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"/>
-    </LinearLayout>
-
 </RelativeLayout>

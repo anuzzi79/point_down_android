@@ -113,6 +113,20 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         val fromNotif = intent.getBooleanExtra("from_notification", false)
         if (fromNotif) setStatus("🔔 Notificação recebida: carregando issues Jira…")
 
+        // === NUOVO BLOCCO: mostra modalità attiva (QA/DEV + Squad Mode)
+        val prefs = Prefs(this)
+        when (prefs.profileType) {
+            "DEV" -> {
+                if (prefs.enableSquadMode)
+                    setStatus("👾 Squad Mode (DEV) ativa — visão de desenvolvedor")
+                else
+                    setStatus("🧑‍💻 Perfil DEV ativo")
+            }
+            "QA" -> {
+                setStatus("🧪 Modo QA ativo")
+            }
+        }
+
         loadData()
     }
 
@@ -217,7 +231,19 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 specialEq0 = sEq0
 
                 rebuildDisplayList()
-                setStatus("📊 ${mainList.size} cards + ${specialList.size} especiais.")
+
+                // === Mostra info profilo e squad dopo load
+                val pType = prefs.profileType
+                val squad = prefs.enableSquadMode
+                val extraInfo = when {
+                    pType == "DEV" && squad -> "👾 Squad Mode ativa"
+                    pType == "DEV" && !squad -> "💻 Perfil DEV"
+                    pType == "QA" -> "🧪 QA Mode"
+                    else -> ""
+                }
+
+                setStatus("📊 ${mainList.size} cards + ${specialList.size} especiais.  $extraInfo")
+
             } catch (e: Exception) {
                 Log.e("point_down", "❌ Errore no loadData", e)
                 setStatus("❌ ${e.message}")
@@ -228,6 +254,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     /** Ricostruisce la lista “piatta” per l’adapter rispettando i toggle. */
     private fun rebuildDisplayList() {
         itemsUnified.clear()
+        val prefs = Prefs(this)
 
         // Sezione 1: principali
         itemsUnified.addAll(mainGt0)
@@ -272,12 +299,22 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             }
         }
 
+        // === NUOVO: colorazione o prefisso in Squad Mode
+        if (prefs.profileType == "DEV" && prefs.enableSquadMode) {
+            itemsUnified.indices.forEach { i ->
+                itemsUnified[i] = itemsUnified[i].copy(summary = "👾 " + (itemsUnified[i].summary ?: ""))
+            }
+        } else if (prefs.profileType == "QA") {
+            itemsUnified.indices.forEach { i ->
+                itemsUnified[i] = itemsUnified[i].copy(summary = "🧪 " + (itemsUnified[i].summary ?: ""))
+            }
+        }
+
         adapterUnified?.setData(ArrayList(itemsUnified))
     }
 
     // === Salvataggio ===
     private fun saveChanges(exitAfter: Boolean) {
-        // ➜ Appena si preme Save: smetti di pulsare il bottone
         stopPulsingSaveButtons()
 
         val toSave = itemsUnified.filter {
@@ -420,7 +457,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     private fun stopPulsingStatusText() {
         statusPulseAnimator?.cancel()
         statusPulseAnimator = null
-        // Ripristina il colore di default del testo di status (bianco)
         statusText.setTextColor(ContextCompat.getColor(this, android.R.color.white))
     }
 }
