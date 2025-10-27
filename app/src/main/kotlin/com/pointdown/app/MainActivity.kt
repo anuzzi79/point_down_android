@@ -195,14 +195,37 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                 withContext(Dispatchers.IO) {
                     val finalMain = jira!!.fetchCurrentSprintIssues(jql, enabledStatuses)
-                    val spec = jira!!.fetchSpecialSprintIssues()
+
+                    val special: List<IssueItem> = run {
+                        val pType = prefs.profileType
+                        if (pType == "DEV" && prefs.enableSquadMode) {
+                            val words = Prefs(this@MainActivity).getSquadKeywords()
+                            val epicNums = Prefs(this@MainActivity).getSquadEpics()
+                            jira!!.fetchSquadDevIssues(enabledStatuses, words, epicNums)
+                        } else {
+                            // QA Mode: NON usare parole chiave della Squad Mode
+                            jira!!.fetchSpecialSprintIssues(enabledStatuses, emptyList())
+                        }
+                    }
 
                     mainList = finalMain.toMutableList()
-                    val dedupSpecial = spec.filter { s -> finalMain.none { it.key == s.key } }
+                    val dedupSpecial = special.filter { s -> finalMain.none { it.key == s.key } }
                     specialList = dedupSpecial.toMutableList()
+
+                    // Include explicit codes (FGC-<num>) into main list
+                    val codeNums = Prefs(this@MainActivity).getSearchCodes().map { it.filter { c -> c.isDigit() } }.filter { it.isNotBlank() }
+                    if (codeNums.isNotEmpty()) {
+                        val keys = codeNums.map { "FGC-$it" }
+                        for (k in keys) {
+                            runCatching { jira!!.fetchIssueByKey(k) }.getOrNull()?.let { issue ->
+                                val already = (mainList + specialList).any { it.key == issue.key }
+                                if (!already) mainList.add(0, issue)
+                            }
+                        }
+                    }
                 }
 
-                val force = Prefs(this@MainActivity).forceTestCard
+                val force = Prefs(this@MainActivity).forceTestCard && Prefs(this@MainActivity).profileType != "QA"
                 val forcedKey = (Prefs(this@MainActivity).testIssueKey ?: "FGC-9683").ifBlank { "FGC-9683" }
                 if (force) {
                     try {
@@ -236,9 +259,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 val pType = prefs.profileType
                 val squad = prefs.enableSquadMode
                 val extraInfo = when {
-                    pType == "DEV" && squad -> "👾 Squad Mode ativa"
-                    pType == "DEV" && !squad -> "💻 Perfil DEV"
-                    pType == "QA" -> "🧪 QA Mode"
+                    pType == "DEV" && squad -> "Squad Mode ativa"
+                    pType == "DEV" && !squad -> "Perfil DEV"
+                    pType == "QA" -> "QA Mode"
                     else -> ""
                 }
 
@@ -272,12 +295,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             itemsUnified.addAll(mainEq0)
         }
 
-        // Sezione 2: special
+        // Sezione 2: special / squad output
         if (specialGt0.isNotEmpty() || specialEq0.isNotEmpty()) {
             itemsUnified.add(
                 IssueItem(
                     key = IssueAdapter.DIVIDER_KEY,
-                    summary = getString(R.string.special_title),
+                    summary = if (prefs.profileType == "DEV" && prefs.enableSquadMode)
+                        getString(R.string.squad_title) else getString(R.string.special_title),
                     sp = 0.0,
                     browseUrl = "",
                     isSpecial = true
@@ -300,15 +324,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
 
         // === NUOVO: colorazione o prefisso in Squad Mode
-        if (prefs.profileType == "DEV" && prefs.enableSquadMode) {
-            itemsUnified.indices.forEach { i ->
-                itemsUnified[i] = itemsUnified[i].copy(summary = "👾 " + (itemsUnified[i].summary ?: ""))
-            }
-        } else if (prefs.profileType == "QA") {
-            itemsUnified.indices.forEach { i ->
-                itemsUnified[i] = itemsUnified[i].copy(summary = "🧪 " + (itemsUnified[i].summary ?: ""))
-            }
-        }
+        // Rimuoviamo prefissi emoji dalle card come richiesto
 
         adapterUnified?.setData(ArrayList(itemsUnified))
     }

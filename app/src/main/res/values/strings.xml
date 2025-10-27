@@ -3,6 +3,7 @@
     <string name="app_name">point_down</string>
     <string name="status_loading">Carregando issues da sprint atual…</string>
     <string name="special_title">Cards em que você está provavelmente envolvido por tratarem de Exploratório ou Regression</string>
+    <string name="squad_title">Squad Mode</string>
     <string name="open_in_browser">Abrir</string>
     <string name="notif_title">Precisa baixar o ponto</string>
     <string name="notif_text">Toque para abrir o point_down e ajustar os Story Points.</string>

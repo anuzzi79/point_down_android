@@ -60,8 +60,9 @@
                     android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="6dp"
-                    android:src="@drawable/info_icon"
-                    app:tint="@null"/>
+                    android:src="@drawable/ic_info"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="@string/token_info_desc"/>
             </LinearLayout>
 
             <EditText
@@ -156,13 +157,13 @@
                     android:gravity="center_vertical"
                     android:paddingTop="8dp">
 
-                    <EditText
-                        android:id="@+id/squadKeywordsEdit"
+                <EditText
+                    android:id="@+id/squadKeywordsEdit"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:hint="Ex.: buffer, Support Dev"
-                        android:textColor="#FFFFFF"
+                    android:textColor="#FFFFFF"
                         android:textColorHint="#9AA0A6"/>
 
                     <ImageButton
@@ -194,14 +195,14 @@
                     android:gravity="center_vertical"
                     android:paddingTop="8dp">
 
-                    <EditText
+                <EditText
                         android:id="@+id/squadEpicInput"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:hint="FGC-1234 → digite só números (ex.: 1234)"
                         android:inputType="number"
-                        android:textColor="#FFFFFF"
+                    android:textColor="#FFFFFF"
                         android:textColorHint="#9AA0A6"/>
 
                     <ImageButton

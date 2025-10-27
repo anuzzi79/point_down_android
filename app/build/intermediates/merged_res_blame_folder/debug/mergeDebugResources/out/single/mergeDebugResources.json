@@ -16,6 +16,10 @@
         "source": "com.pointdown.app-main-34:/layout/activity_settings.xml"
     },
     {
+        "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\drawable_ic_add.xml.flat",
+        "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\drawable\\ic_add.xml"
+    },
+    {
         "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
         "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\mipmap-xxhdpi\\ic_launcher_round.webp"
     },
@@ -26,6 +30,14 @@
     {
         "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
         "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\layout_item_divider.xml.flat",
+        "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\layout\\item_divider.xml"
+    },
+    {
+        "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\drawable_opcoes.png.flat",
+        "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\drawable\\opcoes.png"
     },
     {
         "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
@@ -56,6 +68,10 @@
         "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\drawable\\ic_notification.xml"
     },
     {
+        "merged": "com.pointdown.app-debug-32:/drawable_ic_info.xml.flat",
+        "source": "com.pointdown.app-main-34:/drawable/ic_info.xml"
+    },
+    {
         "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\drawable_ic_static_launcher.xml.flat",
         "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\drawable\\ic_static_launcher.xml"
     },
@@ -74,6 +90,10 @@
     {
         "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\drawable_info_icon.xml.flat",
         "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\drawable\\info_icon.xml"
+    },
+    {
+        "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\layout_item_toggle.xml.flat",
+        "source": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-main-34:\\layout\\item_toggle.xml"
     },
     {
         "merged": "C:\\Users\\Antonio Nuzzi\\.gradle\\daemon\\9.0-milestone-1\\com.pointdown.app-debug-32:\\mipmap-xhdpi_ic_launcher_foreground.webp.flat",

@@ -57,6 +57,26 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
         return if (trimmed.isEmpty()) clause else "($trimmed) AND $clause"
     }
 
+    /** Monta OR di parole solo su summary con supporto prefisso. */
+    private fun buildWordsOnlyClause(words: List<String>): String {
+        if (words.isEmpty()) return ""
+        val parts = words.map { w ->
+            val term = w.replace("\"", "\\\"")
+            "(summary ~ \"$term\" OR summary ~ \"${term}*\")"
+        }
+        return parts.joinToString(" OR ")
+    }
+
+    /** Clausa per épicos FGC-<num>: copre sia parent che Epic Link. */
+    private fun buildEpicClause(epicKeys: List<String>): String {
+        if (epicKeys.isEmpty()) return ""
+        val parts = epicKeys.map { key ->
+            val safe = key.replace("\"", "\\\"")
+            "(parent = $safe OR \"Epic Link\" = $safe)"
+        }
+        return parts.joinToString(" OR ")
+    }
+
     suspend fun fetchIssuesByJql(finalJql: String): List<IssueItem> = withContext(Dispatchers.IO) {
         val all = mutableListOf<IssueItem>()
         var nextPageToken: String? = null
@@ -137,14 +157,44 @@ class JiraClient(private val baseUrl: String, email: String, token: String) {
     }
 
     /**
-     * ✅ Lista "Special": come nell'estensione, IGNORA i filtri di status utente.
-     * Cerca in summary e description varianti di "explor*" e "regres*"
-     * su tutte le issue della sprint aperta (non solo le mie).
+     * ✅ Lista "Special" (QA): applica i filtri di status e permette parole extra.
+     * Cerca in summary e description varianti di termini tipo "explor"/"regres" (anche come prefisso) e parole extra.
      */
-    suspend fun fetchSpecialSprintIssues(): List<IssueItem> {
-        val specialBase =
-            """sprint in openSprints() AND (summary ~ "explor" OR summary ~ "explorat*" OR summary ~ "regres" OR summary ~ "regress" OR description ~ "explor*" OR description ~ "regres*")"""
-        return fetchIssuesByJql(specialBase).map { it.copy(isSpecial = true) }
+    suspend fun fetchSpecialSprintIssues(statuses: List<String>, extraWords: List<String>): List<IssueItem> {
+        val baseTerms = listOf("explor", "explorat", "regres", "regress", "regression", "exploratory")
+        val all = (baseTerms + extraWords.filter { it.isNotBlank() })
+            .map { it.replace("\"", "\\\"") }
+        val parts = all.flatMap { term ->
+            listOf(
+                "summary ~ \"$term\"",
+                "summary ~ \"${term}*\"",
+                "description ~ \"$term\"",
+                "description ~ \"${term}*\""
+            )
+        }
+        val orClause = parts.joinToString(" OR ")
+        val base = "sprint in openSprints() AND ($orClause)"
+        val finalJql = jqlWithStatuses(base, statuses)
+        return fetchIssuesByJql(finalJql).map { it.copy(isSpecial = true) }
+    }
+
+    /** ✅ DEV Squad Mode: combina parole ed épicos, applica i filtri status. */
+    suspend fun fetchSquadDevIssues(statuses: List<String>, words: List<String>, epicNums: List<String>): List<IssueItem> {
+        val wordsClause = buildWordsOnlyClause(words.filter { it.isNotBlank() })
+        val epicKeys = epicNums.mapNotNull { n ->
+            val onlyDigits = n.filter { it.isDigit() }
+            if (onlyDigits.isBlank()) null else "FGC-$onlyDigits"
+        }
+        val epicClause = buildEpicClause(epicKeys)
+
+        if (wordsClause.isBlank() && epicClause.isBlank()) return emptyList()
+
+        val combined = if (wordsClause.isNotBlank() && epicClause.isNotBlank())
+            "(($epicClause) AND ($wordsClause))" else "(${wordsClause.ifBlank { epicClause }})"
+
+        val base = "sprint in openSprints() AND $combined"
+        val finalJql = jqlWithStatuses(base, statuses)
+        return fetchIssuesByJql(finalJql)
     }
 
     /** ✅ Lettura puntuale del valore Story Points corrente + id numerico. */

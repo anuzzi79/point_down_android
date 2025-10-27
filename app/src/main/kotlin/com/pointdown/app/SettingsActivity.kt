@@ -58,13 +58,12 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         val stTesting = findViewById<CheckBox>(R.id.st_testing)
         val stQA = findViewById<CheckBox>(R.id.st_qa)
 
-        // Set initial states
+        // === Profilo iniziale ===
         qaCheck.isChecked = prefs.profileType == "QA"
         devCheck.isChecked = prefs.profileType == "DEV"
         squadModeCheck.isChecked = prefs.enableSquadMode
         squadModeBlock.visibility = if (prefs.profileType == "DEV") View.VISIBLE else View.GONE
 
-        // Comportamento mutuamente esclusivo QA/DEV
         qaCheck.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 devCheck.isChecked = false
@@ -83,7 +82,6 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             }
         }
 
-        // Squad Mode
         squadModeCheck.setOnCheckedChangeListener { _, checked ->
             prefs.enableSquadMode = checked
             squadKeywordsEdit.visibility = if (checked) View.VISIBLE else View.GONE
@@ -93,8 +91,7 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
         squadKeywordsEdit.visibility = if (prefs.enableSquadMode) View.VISIBLE else View.GONE
         keywordsChipGroup.visibility = if (prefs.enableSquadMode) View.VISIBLE else View.GONE
 
-        // Load existing keywords
-        fun renderChips(words: List<String>) {
+        fun renderKeywordChips(words: List<String>) {
             keywordsChipGroup.removeAllViews()
             words.forEach { w ->
                 val chip = Chip(this).apply {
@@ -103,14 +100,14 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
                     setOnCloseIconClickListener {
                         val updated = Prefs(this@SettingsActivity).getSquadKeywords().filter { it != w }
                         Prefs(this@SettingsActivity).setSquadKeywords(updated)
-                        renderChips(updated)
+                        renderKeywordChips(updated)
                     }
                 }
                 keywordsChipGroup.addView(chip)
             }
         }
 
-        renderChips(Prefs(this).getSquadKeywords())
+        renderKeywordChips(Prefs(this).getSquadKeywords())
 
         fun addKeywordFromInput() {
             val raw = squadKeywordsEdit.text.toString().trim()
@@ -119,43 +116,13 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             if (!list.contains(raw)) {
                 list.add(raw)
                 Prefs(this).setSquadKeywords(list)
-                renderChips(list)
+                renderKeywordChips(list)
             }
             squadKeywordsEdit.setText("")
         }
 
         addKeywordBtn.setOnClickListener { addKeywordFromInput() }
         squadKeywordsEdit.setOnEditorActionListener { _, _, _ -> addKeywordFromInput(); true }
-
-        // === Campi esistenti ===
-        baseUrl.setText(prefs.baseUrl)
-        email.setText(prefs.email)
-        token.setText(prefs.token)
-        jql.setText(prefs.jql)
-
-        val (h0, m0) = prefs.getHourMinute()
-        timePicker.setIs24HourView(true)
-        if (Build.VERSION.SDK_INT >= 23) { timePicker.hour = h0; timePicker.minute = m0 }
-        else { timePicker.currentHour = h0; timePicker.currentMinute = m0 }
-
-        findViewById<ImageButton>(R.id.infoTokenBtn).setOnClickListener {
-            val url = "https://youtu.be/X1F5LfCuq6I"
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        }
-
-        // === Advanced defaults ===
-        forceTestCardCheck.isChecked = prefs.forceTestCard
-        enableQueueLockCheck.isChecked = prefs.enableQueueLock
-        enableWeekendCheck.isChecked = prefs.enableWeekendNotifications
-
-        stTodo.isChecked = prefs.stToDo
-        stInProgress.isChecked = prefs.stInProgress
-        stBlocked.isChecked = prefs.stBlocked
-        stNeedReqs.isChecked = prefs.stNeedReqs
-        stDone.isChecked = prefs.stDone
-        stCodeReview.isChecked = prefs.stCodeReview
-        stTesting.isChecked = prefs.stTesting
-        stQA.isChecked = prefs.stQA
 
         fun renderCodeChips(codes: List<String>) {
             val grp = findViewById<ChipGroup>(R.id.searchCodesChipGroup)
@@ -218,6 +185,36 @@ class SettingsActivity : AppCompatActivity(), CoroutineScope {
             }
             squadEpicInput.setText("")
         }
+
+        // === Campi esistenti ===
+        baseUrl.setText(prefs.baseUrl)
+        email.setText(prefs.email)
+        token.setText(prefs.token)
+        jql.setText(prefs.jql)
+
+        val (h0, m0) = prefs.getHourMinute()
+        timePicker.setIs24HourView(true)
+        if (Build.VERSION.SDK_INT >= 23) { timePicker.hour = h0; timePicker.minute = m0 }
+        else { timePicker.currentHour = h0; timePicker.currentMinute = m0 }
+
+        findViewById<ImageButton>(R.id.infoTokenBtn).setOnClickListener {
+            val url = "https://youtu.be/X1F5LfCuq6I"
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        }
+
+        // === Advanced defaults ===
+        forceTestCardCheck.isChecked = prefs.forceTestCard
+        enableQueueLockCheck.isChecked = prefs.enableQueueLock
+        enableWeekendCheck.isChecked = prefs.enableWeekendNotifications
+
+        stTodo.isChecked = prefs.stToDo
+        stInProgress.isChecked = prefs.stInProgress
+        stBlocked.isChecked = prefs.stBlocked
+        stNeedReqs.isChecked = prefs.stNeedReqs
+        stDone.isChecked = prefs.stDone
+        stCodeReview.isChecked = prefs.stCodeReview
+        stTesting.isChecked = prefs.stTesting
+        stQA.isChecked = prefs.stQA
 
         // Test connessione
         testBtn.setOnClickListener {
